@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/coruja.png">
+  <title>Jogo de Subtração</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #00BFFF, #0000FF);
+      color: #FFFFFF;
+      text-align: center;
+    }
+
+    .container {
+      margin: 20px;
+      padding: 10px;
+    }
+
+    .logo-container {
+      display: inline-block;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 100px;
+      height: 100px;
+      margin: 10px auto;
+      border: 3px solid #FFFFFF;
+    }
+
+    .logo {
+      width: 100%;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #FFFFFF;
+      text-shadow: 2px 2px #0000FF;
+      animation: bounceTitle 2s infinite;
+    }
+
+    .question {
+      background: #FFFFFF;
+      color: #0000FF;
+      border-radius: 15px;
+      padding: 15px;
+      margin: 10px auto;
+      width: 90%;
+      max-width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 1.2rem;
+    }
+
+    .answer-container {
+      margin: 15px auto;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .answer-container button {
+      background: #00BFFF;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin: 5px;
+    }
+
+    .answer-container button:hover {
+      background: #0000FF;
+    }
+
+    .message {
+      font-size: 1rem;
+      padding: 10px;
+      border-radius: 15px;
+      margin: 10px auto;
+      width: 90%;
+      max-width: 300px;
+      color: #FFF;
+      font-weight: bold;
+      text-shadow: 2px 2px #0000FF;
+      display: none;
+    }
+
+    .correct {
+      background: #32CD32; /* Verde claro */
+      animation: bounceCorrect 1s ease-out infinite;
+    }
+
+    .wrong {
+      background: #FF6347; /* Vermelho claro */
+      animation: shakeWrong 0.5s ease-out infinite;
+    }
+
+    #startGame {
+      background: #32CD32; /* Verde claro */
+      color: #FFFFFF;
+      font-size: 1rem;
+      border: none;
+      border-radius: 15px;
+      padding: 10px 20px;
+      margin: 10px auto;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    #startGame:hover {
+      background: #228B22; /* Verde mais escuro */
+      transform: scale(1.05);
+    }
+
+    #startGame:active {
+      background: #006400; /* Verde ainda mais escuro */
+      transform: scale(1);
+    }
+
+    #counter, #lives {
+      font-size: 1rem;
+      margin: 5px;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .question, .message {
+        font-size: 1rem;
+      }
+
+      .answer-container button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+
+      #startGame {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+      }
+    }
+
+    @keyframes bounceTitle {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-20px);
+      }
+      60% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes bounceCorrect {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shakeWrong {
+      0% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-10px);
+      }
+      50% {
+        transform: translateX(10px);
+      }
+      75% {
+        transform: translateX(-10px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+    #backToHome {
+      background: #FF6347; /* Vermelho claro */
+      color: #FFFFFF;
+      font-size: 1rem;
+      border: none;
+      border-radius: 15px;
+      padding: 10px 20px;
+      margin: 10px auto;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      display: inline-block;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    #backToHome:hover {
+      background: #FF4500; /* Vermelho mais escuro */
+      transform: scale(1.05);
+    }
+
+    #bestScore {
+      font-size: 1.2rem;
+      margin: 10px;
+      color: #FFFF00; /* Amarelo */
+      text-shadow: 1px 1px 2px #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="img/logo.png" alt="Logo do Reforço" class="logo">
+    </div>
+    <h1>Jogo de Subtração</h1>
+    <div id="bestScore">Melhor Pontuação: 0</div>
+    <div id="counter">Acertos: 0</div>
+    <div id="lives">Vidas: 3</div>
+    <button id="startGame">Iniciar Jogo</button>
+    <div id="game" class="question">
+      Clique no botão para iniciar o jogo!
+    </div>
+    <div class="answer-container" id="answers"></div>
+    <div id="correctMessage" class="message correct">
+      Uhuul! Você acertou! Vamos para o próximo nível! 🎉
+    </div>
+    <div id="wrongMessage" class="message wrong">
+      Oh não! Tente novamente! 😢
+    </div>
+    <a id="backToHome" href="index.html">Voltar para a Página Inicial</a>
+  </div>
+  <script>
+    let currentLevel = 1;
+    let score = 0;
+    let lives = 3;
+    let bestScore = localStorage.getItem('bestsubtracao') || 0;
+
+    function updateCounter() {
+      document.getElementById('counter').textContent = `Acertos: ${score}`;
+      document.getElementById('lives').textContent = `Vidas: ${lives}`;
+      document.getElementById('bestScore').textContent = `Melhor Pontuação: ${bestScore}`;
+    }
+
+    function generateQuestion() {
+      const num1 = Math.floor(Math.random() * (currentLevel * 10)) + 1;
+      const num2 = Math.floor(Math.random() * num1) + 1;
+      const correctAnswer = num1 - num2;
+
+      document.getElementById('game').textContent = `${num1} - ${num2} = ?`;
+
+      const answersContainer = document.getElementById('answers');
+      answersContainer.innerHTML = '';
+
+      const usedAnswers = new Set();
+      usedAnswers.add(correctAnswer);
+
+      const correctButton = document.createElement('button');
+      correctButton.textContent = correctAnswer;
+      correctButton.onclick = () => {
+        score++;
+        if (score % 20 === 0) lives++; // Ganha uma vida a cada 20 acertos
+        currentLevel++;
+        updateCounter();
+        showMessage('correct');
+        setTimeout(generateQuestion, 2000);
+      };
+
+      answersContainer.appendChild(correctButton);
+
+      for (let i = 0; i < 3; i++) {
+        let wrongAnswer;
+        do {
+          wrongAnswer = correctAnswer + Math.floor(Math.random() * 10) - 5;
+        } while (usedAnswers.has(wrongAnswer) || wrongAnswer < 0);
+        usedAnswers.add(wrongAnswer);
+
+        const wrongButton = document.createElement('button');
+        wrongButton.textContent = wrongAnswer;
+        wrongButton.onclick = () => handleWrongAnswer();
+        answersContainer.appendChild(wrongButton);
+      }
+
+      for (let i = answersContainer.children.length; i >= 0; i--) {
+        answersContainer.appendChild(answersContainer.children[Math.random() * i | 0]);
+      }
+    }
+
+    function handleWrongAnswer() {
+      lives--;
+      updateCounter();
+      showMessage('wrong');
+      if (lives === 0) {
+        if (score > bestScore) {
+          bestScore = score;
+          localStorage.setItem('bestsubtracao', bestScore);
+        }
+        setTimeout(() => {
+          alert('Você perdeu! O jogo será reiniciado.');
+          resetGame();
+        }, 1000);
+      } else {
+        setTimeout(generateQuestion, 2000);
+      }
+    }
+
+    function showMessage(type) {
+      const correctMessage = document.getElementById('correctMessage');
+      const wrongMessage = document.getElementById('wrongMessage');
+
+      if (type === 'correct') {
+        correctMessage.style.display = 'block';
+        wrongMessage.style.display = 'none';
+      } else {
+        correctMessage.style.display = 'none';
+        wrongMessage.style.display = 'block';
+      }
+
+      setTimeout(() => {
+        correctMessage.style.display = 'none';
+        wrongMessage.style.display = 'none';
+      }, 2000);
+    }
+
+    function resetGame() {
+      score = 0;
+      currentLevel = 1;
+      lives = 3;
+      updateCounter();
+      document.getElementById('startGame').style.display = 'block';
+      generateQuestion();
+    }
+
+    document.getElementById('startGame').onclick = () => {
+      score = 0;
+      currentLevel = 1;
+      lives = 3;
+      updateCounter();
+      document.getElementById('startGame').style.display = 'none';
+      generateQuestion();
+    };
+
+    updateCounter();
+  </script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/coruja.png">
+  <title>Jogo de Tabuada</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #FFD700, #FFA500);
+      color: #000000;
+      text-align: center;
+    }
+
+    .logo-container {
+      display: inline-block;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 80px;
+      height: 80px;
+      margin: 10px auto;
+      border: 3px solid #FFFFFF;
+    }
+
+    .logo {
+      width: 100%;
+      height: auto;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: #FFFFFF;
+      text-shadow: 2px 2px #FFA500;
+      margin-bottom: 20px;
+    }
+
+    .level {
+      font-size: 1.5rem;
+      margin: 20px 0;
+      font-weight: bold;
+      color: #FFFFFF;
+    }
+
+    .question {
+      background: #FFFFFF;
+      color: #FF8C00;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .answer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+
+    .answer-row span {
+      flex: 1;
+      text-align: left;
+      font-size: 1.1rem;
+    }
+
+    .answer-row input {
+      flex: 1;
+      max-width: 100px;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #FFA500;
+      font-size: 1rem;
+    }
+
+    .start-button, .submit-button {
+      background: #FFD700;
+      color: #000000;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 20px auto;
+      display: block;
+      transition: background 0.3s;
+    }
+
+    .start-button:hover, .submit-button:hover {
+      background: #FFA500;
+    }
+
+    .message {
+      font-size: 1.5rem;
+      padding: 15px;
+      border-radius: 15px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 500px;
+      color: #FFF;
+      font-weight: bold;
+      text-shadow: 2px 2px #FF4500;
+    }
+
+    .correct {
+      background: #32CD32;
+    }
+
+    .wrong {
+      background: #FF6347;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .level {
+        font-size: 1.2rem;
+      }
+
+      .answer-row span, .answer-row input {
+        font-size: 1rem;
+      }
+
+      .start-button, .submit-button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+
+      .message {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="img/logo.png" alt="Logo do Reforço" class="logo">
+    </div>
+    <h1>Jogo de Tabuada</h1>
+    <div id="level" class="level">Nível: 1</div>
+    <div id="game" class="question">
+      Clique no botão para começar o jogo!
+    </div>
+    <button id="startButton" class="start-button">Iniciar Jogo</button>
+    <button id="submitButton" class="submit-button" style="display: none;">Enviar Respostas</button>
+    <div id="resultMessage" class="message" style="display: none;"></div>
+  </div>
+
+  <script>
+    let currentLevel = 1;
+
+    function updateLevel() {
+      document.getElementById('level').textContent = `Nível: ${currentLevel}`;
+    }
+
+    function resetGame() {
+      currentLevel = 1;
+      updateLevel();
+      document.getElementById('startButton').style.display = 'block';
+      document.getElementById('game').innerHTML = 'Clique no botão para começar o jogo!';
+      document.getElementById('submitButton').style.display = 'none';
+      document.getElementById('resultMessage').style.display = 'none';
+    }
+
+    function generateTabuada() {
+      const gameContainer = document.getElementById('game');
+      gameContainer.innerHTML = '';
+
+      for (let i = 1; i <= 10; i++) {
+        const row = document.createElement('div');
+        row.className = 'answer-row';
+
+        const label = document.createElement('span');
+        label.textContent = `${currentLevel} x ${i} = `;
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = `answer-${i}`;
+
+        row.appendChild(label);
+        row.appendChild(input);
+        gameContainer.appendChild(row);
+      }
+
+      document.getElementById('submitButton').style.display = 'block';
+    }
+
+    function checkAnswers() {
+      let correct = 0;
+
+      for (let i = 1; i <= 10; i++) {
+        const input = document.getElementById(`answer-${i}`);
+        const userAnswer = parseInt(input.value);
+        const correctAnswer = currentLevel * i;
+
+        if (userAnswer === correctAnswer) {
+          correct++;
+          input.style.borderColor = '#32CD32';
+        } else {
+          input.style.borderColor = '#FF6347';
+        }
+      }
+
+      const message = document.getElementById('resultMessage');
+      message.style.display = 'block';
+
+      if (correct === 10) {
+        message.textContent = 'Parabéns! Você acertou todos!';
+        message.className = 'message correct';
+        currentLevel++;
+        if (currentLevel > 10) {
+          alert('Você completou todas as tabuadas! O jogo será reiniciado.');
+          resetGame();
+        } else {
+          updateLevel();
+          setTimeout(generateTabuada, 2000);
+        }
+      } else {
+        message.textContent = `Você acertou ${correct} de 10. Tente novamente!`;
+        message.className = 'message wrong';
+      }
+    }
+
+    document.getElementById('startButton').onclick = () => {
+      document.getElementById('startButton').style.display = 'none';
+      updateLevel();
+      generateTabuada();
+    };
+
+    document.getElementById('submitButton').onclick = checkAnswers;
+  </script>
+</body>
+</html>

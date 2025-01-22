@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/coruja.png">
+  <title>Jogo de Potenciação</title>
+  <style>
+    /* Seu estilo permanece o mesmo */
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #00BFFF, #0000FF);
+      color: #FFFFFF;
+      text-align: center;
+    }
+
+    .container {
+      margin: 20px;
+    }
+
+    .logo-container {
+      display: inline-block;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 100px;
+      height: 100px;
+      margin: 10px auto;
+      border: 3px solid #FFFFFF;
+    }
+
+    .logo {
+      width: 100%;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #FFFFFF;
+      text-shadow: 2px 2px #0000FF;
+      animation: bounceTitle 2s infinite;
+    }
+
+    .question {
+      background: #FFFFFF;
+      color: #0000FF;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 1.5rem;
+    }
+
+    .answer-container {
+      margin: 20px;
+    }
+
+    .answer-container button,
+    .start-button {
+      background: #00BFFF;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin: 5px;
+    }
+
+    .answer-container button:hover,
+    .start-button:hover {
+      background: #0000FF;
+    }
+
+    .message {
+      font-size: 1.5rem;
+      padding: 15px;
+      border-radius: 15px;
+      margin: 20px auto;
+      width: 300px;
+      color: #FFF;
+      font-weight: bold;
+      text-shadow: 2px 2px #0000FF;
+      display: none;
+    }
+
+    .correct {
+      background: #32CD32;
+      animation: bounceCorrect 1s ease-out infinite;
+    }
+
+    .wrong {
+      background: #FF6347;
+      animation: shakeWrong 0.5s ease-out infinite;
+    }
+
+    .score {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .lives {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    @keyframes bounceTitle {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-20px);
+      }
+      60% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes bounceCorrect {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shakeWrong {
+      0% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-10px);
+      }
+      50% {
+        transform: translateX(10px);
+      }
+      75% {
+        transform: translateX(-10px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+    .score,
+    .lives {
+      font-size: 1rem;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .best-score {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #FFD700;
+      font-weight: bold;
+    }
+
+    .home-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #FFD700;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .home-button:hover {
+      background: #FFA500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="img/logo.png" alt="Logo do Reforço" class="logo">
+    </div>
+    <h1>Jogo de Potenciação</h1>
+    <div id="game" class="question">
+      Clique no botão para iniciar o jogo!
+    </div>
+    <div id="score" class="score">
+      Acertos: 0
+    </div>
+    <div id="lives" class="lives">
+      Vidas: 3
+    </div>
+    <div id="bestScore" class="best-score">
+      Melhor Pontuação: 0
+    </div>
+    <button id="startButton" class="start-button">Iniciar Jogo</button>
+    <div class="answer-container" id="answers">
+      <!-- Botões de resposta serão gerados aqui -->
+    </div>
+    <div id="correctMessage" class="message correct">
+      Uhuul! Você acertou! Vamos para o próximo nível! 🎉
+    </div>
+    <div id="wrongMessage" class="message wrong">
+      Oh não! Tente novamente! 😢
+    </div>
+    <a href="index.html" class="home-button">Voltar à Página Inicial</a>
+  </div>
+  <script>
+    let currentLevel = 1;
+    let score = 0;
+    let lives = 3;
+
+    const bestScoreElement = document.getElementById('bestScore');
+    const savedBestScore = localStorage.getItem('bestpotencia') || 0;
+    bestScoreElement.textContent = `Melhor Pontuação: ${savedBestScore}`;
+
+    function updateScore() {
+      document.getElementById('score').textContent = `Acertos: ${score}`;
+      if (score > savedBestScore) {
+        localStorage.setItem('bestpotencia', score);
+        bestScoreElement.textContent = `Melhor Pontuação: ${score}`;
+      }
+    }
+
+    function updateLives() {
+      document.getElementById('lives').textContent = `Vidas: ${lives}`;
+    }
+
+    function resetGame() {
+      currentLevel = 1;
+      score = 0;
+      lives = 3;
+      updateScore();
+      updateLives();
+      document.getElementById('startButton').style.display = 'block';
+      document.getElementById('game').textContent = 'Clique no botão para iniciar o jogo!';
+      document.getElementById('answers').innerHTML = '';
+    }
+
+    function generateQuestion() {
+      const base = Math.floor(Math.random() * (currentLevel * 3)) + 2; // Base entre 2 e níveis mais altos
+      const exponent = Math.floor(Math.random() * 3) + 2; // Expoente entre 2 e 4
+      const correctAnswer = Math.pow(base, exponent);
+
+      // Alterando para a notação matemática mais tradicional
+      document.getElementById('game').textContent = `${base} elevado a ${exponent} = ?`;
+
+      const answersContainer = document.getElementById('answers');
+      answersContainer.innerHTML = '';
+
+      const usedAnswers = new Set();
+      usedAnswers.add(correctAnswer);
+
+      const correctButton = document.createElement('button');
+      correctButton.textContent = correctAnswer;
+      correctButton.onclick = () => {
+        score++;
+        updateScore();
+        currentLevel++;
+        showMessage('correct');
+        setTimeout(generateQuestion, 2000);
+      };
+
+      answersContainer.appendChild(correctButton);
+
+      for (let i = 0; i < 3; i++) {
+        let wrongAnswer;
+        do {
+          wrongAnswer = correctAnswer + Math.floor(Math.random() * 20) - 10;
+        } while (usedAnswers.has(wrongAnswer) || wrongAnswer <= 0);
+        usedAnswers.add(wrongAnswer);
+
+        const wrongButton = document.createElement('button');
+        wrongButton.textContent = wrongAnswer;
+        wrongButton.onclick = () => {
+          lives--;
+          updateLives();
+          if (lives === 0) {
+            alert('Você perdeu todas as vidas! O jogo será reiniciado.');
+            resetGame();
+          } else {
+            showMessage('wrong');
+          }
+        };
+        answersContainer.appendChild(wrongButton);
+      }
+
+      for (let i = answersContainer.children.length; i >= 0; i--) {
+        answersContainer.appendChild(answersContainer.children[Math.random() * i | 0]);
+      }
+    }
+
+    function showMessage(type) {
+      const correctMessage = document.getElementById('correctMessage');
+      const wrongMessage = document.getElementById('wrongMessage');
+      
+      if (type === 'correct') {
+        correctMessage.style.display = 'block';
+        wrongMessage.style.display = 'none';
+      } else {
+        correctMessage.style.display = 'none';
+        wrongMessage.style.display = 'block';
+      }
+      setTimeout(() => {
+        correctMessage.style.display = 'none';
+        wrongMessage.style.display = 'none';
+      }, 2000);
+    }
+
+    document.getElementById('startButton').onclick = () => {
+      document.getElementById('startButton').style.display = 'none';
+      currentLevel = 1;
+      score = 0;
+      lives = 3;
+      updateScore();
+      updateLives();
+      generateQuestion();
+    };
+  </script>
+</body>
+</html>

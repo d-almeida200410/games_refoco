@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/coruja.png">
+  <title>Jogo de Divisão</title>
+  <style>
+    /* Seu CSS permanece o mesmo */
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #00BFFF, #0000FF);
+      color: #FFFFFF;
+      text-align: center;
+    }
+
+    .container {
+      margin: 20px;
+      padding: 0 10px;
+    }
+
+    .logo-container {
+      display: inline-block;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 100px;
+      height: 100px;
+      margin: 10px auto;
+      border: 3px solid #FFFFFF;
+    }
+
+    .logo {
+      width: 100%;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #FFFFFF;
+      text-shadow: 2px 2px #0000FF;
+      animation: bounceTitle 2s infinite;
+    }
+
+    .score {
+      font-size: 1.5rem;
+      margin: 10px;
+      color: #FFD700;
+      text-shadow: 1px 1px #000000;
+    }
+
+    .question {
+      background: #FFFFFF;
+      color: #0000FF;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 1.5rem;
+    }
+
+    .answer-container {
+      margin: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .answer-container button {
+      background: #00BFFF;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      flex: 1 1 calc(50% - 10px);
+      max-width: 120px;
+    }
+
+    .answer-container button:hover {
+      background: #0000FF;
+    }
+
+    .message {
+      font-size: 1.5rem;
+      padding: 15px;
+      border-radius: 15px;
+      margin: 20px auto;
+      max-width: 300px;
+      color: #FFF;
+      font-weight: bold;
+      text-shadow: 2px 2px #0000FF;
+      display: none;
+    }
+
+    .correct {
+      background: #32CD32;
+      animation: bounceCorrect 1s ease-out infinite;
+    }
+
+    .wrong {
+      background: #FF6347;
+      animation: shakeWrong 0.5s ease-out infinite;
+    }
+
+    #startGame {
+      background: #32CD32;
+      color: #FFFFFF;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 15px;
+      padding: 15px 30px;
+      margin: 20px auto;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    #startGame:hover {
+      background: #228B22;
+      transform: scale(1.05);
+    }
+
+    #backToHome {
+      background: #FF4500;
+      color: #FFFFFF;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      margin: 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #backToHome:hover {
+      background: #FF6347;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="img/logo.png" alt="Logo do Reforço" class="logo">
+    </div>
+    <h1>Jogo de Divisão</h1>
+    <div class="score" id="score">Acertos: 0</div>
+    <div id="lives" class="score">Vidas: 3</div>
+    <div id="bestScore" class="score">Melhor Pontuação: 0</div>
+    <button id="startGame" onclick="startGame()">Iniciar Jogo</button>
+    <div id="game" class="question">
+      Clique no botão para iniciar o jogo!
+    </div>
+    <div class="answer-container" id="answers"></div>
+    <div id="correctMessage" class="message correct">
+      Uhuul! Você acertou! Vamos para o próximo nível! 🎉
+    </div>
+    <div id="wrongMessage" class="message wrong">
+      Oh não! Tente novamente! 😢
+    </div>
+    <button id="backToHome" onclick="window.location.href='index.html'">Voltar à Página Inicial</button>
+  </div>
+  <script>
+    let currentLevel = 1;
+    let score = 0;
+    let lives = 3;
+    let bestdivisao = localStorage.getItem('bestdivisao') || 0;
+
+    document.getElementById('bestScore').textContent = `Melhor Pontuação: ${bestdivisao}`;
+
+    function startGame() {
+      currentLevel = 1;
+      score = 0;
+      lives = 3;
+      document.getElementById('startGame').style.display = 'none';
+      updateScore();
+      updateLives();
+      generateQuestion();
+    }
+
+    function generateQuestion() {
+      let num1, num2, correctAnswer;
+
+      do {
+        num1 = Math.floor(Math.random() * (currentLevel * 10)) + 1;
+        num2 = Math.floor(Math.random() * num1) + 1;
+        correctAnswer = num1 % num2 === 0 ? num1 / num2 : null;
+      } while (correctAnswer === null);
+
+      document.getElementById('game').textContent = `${num1} ÷ ${num2} = ?`;
+
+      const answersContainer = document.getElementById('answers');
+      answersContainer.innerHTML = '';
+
+      const usedAnswers = new Set();
+      usedAnswers.add(correctAnswer);
+
+      const correctButton = document.createElement('button');
+      correctButton.textContent = correctAnswer;
+      correctButton.onclick = () => {
+        currentLevel++;
+        score++;
+        if (score % 20 === 0) lives++;
+        updateScore();
+        updateLives();
+        showMessage('correct');
+        setTimeout(generateQuestion, 2000);
+      };
+
+      answersContainer.appendChild(correctButton);
+
+      for (let i = 0; i < 3; i++) {
+        let wrongAnswer;
+        do {
+          wrongAnswer = correctAnswer + Math.floor(Math.random() * 10) - 5;
+        } while (
+          usedAnswers.has(wrongAnswer) ||
+          wrongAnswer <= 0 ||
+          wrongAnswer % 1 !== 0
+        );
+        usedAnswers.add(wrongAnswer);
+
+        const wrongButton = document.createElement('button');
+        wrongButton.textContent = wrongAnswer;
+        wrongButton.onclick = handleWrongAnswer;
+        answersContainer.appendChild(wrongButton);
+      }
+
+      for (let i = answersContainer.children.length; i >= 0; i--) {
+        answersContainer.appendChild(answersContainer.children[Math.random() * i | 0]);
+      }
+    }
+
+    function handleWrongAnswer() {
+      lives--;
+      updateLives();
+      showMessage('wrong');
+      if (lives === 0) {
+        alert('Você perdeu todas as vidas!');
+        if (score > bestdivisao) {
+          bestdivisao = score;
+          localStorage.setItem('bestdivisao', bestdivisao);
+        }
+        startGame();
+      } else {
+        setTimeout(generateQuestion, 2000);
+      }
+    }
+
+    function updateScore() {
+      document.getElementById('score').textContent = `Acertos: ${score}`;
+    }
+
+    function updateLives() {
+      document.getElementById('lives').textContent = `Vidas: ${lives}`;
+    }
+
+    function showMessage(type) {
+      const correctMessage = document.getElementById('correctMessage');
+      const wrongMessage = document.getElementById('wrongMessage');
+
+      if (type === 'correct') {
+        correctMessage.style.display = 'block';
+        wrongMessage.style.display = 'none';
+      } else {
+        correctMessage.style.display = 'none';
+        wrongMessage.style.display = 'block';
+      }
+      setTimeout(() => {
+        correctMessage.style.display = 'none';
+        wrongMessage.style.display = 'none';
+      }, 2000);
+    }
+  </script>
+</body>
+
+</html>

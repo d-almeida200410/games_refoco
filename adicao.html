@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/coruja.png">
+  <title>Jogo de Adição</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #00BFFF, #0000FF);
+      color: #FFFFFF;
+      text-align: center;
+    }
+
+    .container {
+      margin: 20px;
+      padding: 0 10px;
+    }
+
+    .logo-container {
+      display: inline-block;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 80px;
+      height: 80px;
+      margin: 10px auto;
+      border: 3px solid #FFFFFF;
+    }
+
+    .logo {
+      width: 100%;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #FFFFFF;
+      text-shadow: 2px 2px #0000FF;
+      animation: bounceTitle 2s infinite;
+      margin: 10px 0;
+    }
+
+    .question {
+      background: #FFFFFF;
+      color: #0000FF;
+      border-radius: 15px;
+      padding: 15px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 1.2rem;
+    }
+
+    .answer-container {
+      margin: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .answer-container button,
+    .start-button {
+      background: #00BFFF;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .answer-container button:hover,
+    .start-button:hover {
+      background: #0000FF;
+    }
+
+    .message {
+      font-size: 1rem;
+      padding: 10px;
+      border-radius: 15px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 300px;
+      color: #FFF;
+      font-weight: bold;
+      text-shadow: 2px 2px #0000FF;
+      display: none;
+    }
+
+    .correct {
+      background: #32CD32;
+    }
+
+    .wrong {
+      background: #FF6347;
+    }
+
+    .score,
+    .lives {
+      font-size: 1rem;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .best-score {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #FFD700;
+      font-weight: bold;
+    }
+
+    .home-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #FFD700;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .home-button:hover {
+      background: #FFA500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="img/logo.png" alt="Logo do Reforço" class="logo">
+    </div>
+    <h1>Jogo de Adição</h1>
+    <div id="game" class="question">
+      Clique no botão para iniciar o jogo!
+    </div>
+    <div id="score" class="score">
+      Acertos: 0
+    </div>
+    <div id="lives" class="lives">
+      Vidas: 3
+    </div>
+    <div id="bestScore" class="best-score">
+      Melhor Pontuação: 0
+    </div>
+    <button id="startButton" class="start-button">Iniciar Jogo</button>
+    <div class="answer-container" id="answers">
+      <!-- Botões de resposta serão gerados aqui -->
+    </div>
+    <a href="index.html" class="home-button">Voltar à Página Inicial</a>
+  </div>
+  <script>
+    let currentLevel = 1;
+    let score = 0;
+    let lives = 3;
+
+    const bestScoreElement = document.getElementById('bestScore');
+    const savedBestScore = localStorage.getItem('bestadicao') || 0;
+    bestScoreElement.textContent = `Melhor Pontuação: ${savedBestScore}`;
+
+    function updateScore() {
+      document.getElementById('score').textContent = `Acertos: ${score}`;
+      if (score > savedBestScore) {
+        localStorage.setItem('bestadicao', score);
+        bestScoreElement.textContent = `Melhor Pontuação: ${score}`;
+      }
+    }
+
+    function updateLives() {
+      document.getElementById('lives').textContent = `Vidas: ${lives}`;
+    }
+
+    function resetGame() {
+      currentLevel = 1;
+      score = 0;
+      lives = 3;
+      updateScore();
+      updateLives();
+      document.getElementById('startButton').style.display = 'block';
+      document.getElementById('game').textContent = 'Clique no botão para iniciar o jogo!';
+      document.getElementById('answers').innerHTML = '';
+    }
+
+    function generateQuestion() {
+      const num1 = Math.floor(Math.random() * (currentLevel * 10)) + 1;
+      const num2 = Math.floor(Math.random() * (currentLevel * 10)) + 1;
+      const correctAnswer = num1 + num2;
+
+      document.getElementById('game').textContent = `${num1} + ${num2} = ?`;
+
+      const answersContainer = document.getElementById('answers');
+      answersContainer.innerHTML = '';
+
+      const usedAnswers = new Set();
+      usedAnswers.add(correctAnswer);
+
+      const correctButton = document.createElement('button');
+      correctButton.textContent = correctAnswer;
+      correctButton.onclick = () => {
+        score++;
+        if (score % 20 === 0) lives++;
+        updateScore();
+        updateLives();
+        currentLevel++;
+        generateQuestion();
+      };
+      answersContainer.appendChild(correctButton);
+
+      for (let i = 0; i < 3; i++) {
+        let wrongAnswer;
+        do {
+          wrongAnswer = correctAnswer + Math.floor(Math.random() * 10) - 5;
+        } while (usedAnswers.has(wrongAnswer) || wrongAnswer <= 0);
+        usedAnswers.add(wrongAnswer);
+
+        const wrongButton = document.createElement('button');
+        wrongButton.textContent = wrongAnswer;
+        wrongButton.onclick = () => {
+          lives--;
+          updateLives();
+          if (lives === 0) {
+            alert('Você perdeu todas as vidas! O jogo será reiniciado.');
+            resetGame();
+          }
+        };
+        answersContainer.appendChild(wrongButton);
+      }
+    }
+
+    document.getElementById('startButton').onclick = () => {
+      document.getElementById('startButton').style.display = 'none';
+      currentLevel = 1;
+      score = 0;
+      lives = 3;
+      updateScore();
+      updateLives();
+      generateQuestion();
+    };
+  </script>
+</body>
+</html>
