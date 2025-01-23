@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo da Memória</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #00ff11, #128c12);
+      animation: backgroundAnimation 10s ease infinite;
+    }
+
+    @keyframes backgroundAnimation {
+      0% { background: linear-gradient(135deg, #00ff11, #128c12); }
+      50% { background: linear-gradient(135deg, #00ffbb, #128c12); }
+      100% { background: linear-gradient(135deg, #00ff11, #128c12); }
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #FFFFFF;
+      text-shadow: 2px 2px #0000FF;
+      animation: bounceTitle 2s infinite;
+      margin: 10px 0;
+    }
+
+    .game-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 15px;
+      max-width: 600px;
+      width: 90%;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 100%;
+      aspect-ratio: 1;
+      background: radial-gradient(circle, #007bff, #0056b3);
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transform: scale(1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s, background 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .card.flipped {
+      background: linear-gradient(135deg, #fff, #e4e4e4);
+    }
+
+    .card img {
+      display: none;
+      width: 80%;
+    }
+
+    .card.flipped img {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .game-container {
+        gap: 10px;
+      }
+    }
+
+    .success-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #ffffff;
+      color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      display: none;
+      text-align: center;
+    }
+
+    .success-message.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jogo da Memória</h1>
+  <div class="game-container" id="gameContainer"></div>
+  <div class="success-message" id="successMessage">
+    Parabéns! Você completou o jogo😁👍🎉!!!<br>
+  </div>
+
+  <script>
+    const cardsArray = [
+      { name: 'cat', img: '/img/cat.png' },
+      { name: 'dog', img: '/img/dog.png' },
+      { name: 'bird', img: '/img/bird.png' },
+      { name: 'owl', img: '/img/owl.png' },
+      { name: 'cat', img: '/img/cat.png' },
+      { name: 'dog', img: '/img/dog.png' },
+      { name: 'bird', img: '/img/bird.png' },
+      { name: 'fish', img: '/img/fish.png' },
+      { name: 'owl', img: '/img/owl.png' },
+      { name: 'fish', img: '/img/fish.png' },
+      { name: 'arara', img: '/img/arara.png' },
+      { name: 'arara', img: '/img/arara.png' },
+      { name: 'borboleta', img: '/img/borboleta.png' },
+      { name: 'borboleta', img: '/img/borboleta.png' },
+      { name: 'macaco', img: '/img/monkey.png' },
+      { name: 'macaco', img: '/img/monkey.png' },
+      { name: 'baleia', img: '/img/baleia.png' },
+      { name: 'baleia', img: '/img/baleia.png' },
+      { name: 'lion', img: '/img/lion.png' },
+      { name: 'lion', img: '/img/lion.png' },
+      { name: 'tiger', img: '/img/tiger.png' },
+      { name: 'tiger', img: '/img/tiger.png' },
+      { name: 'elefante', img: '/img/elefante.png' },
+      { name: 'elefante', img: '/img/elefante.png' },
+    ];
+
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let matchedPairs = 0;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function createCard(cardData) {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.dataset.name = cardData.name;
+
+      const img = document.createElement('img');
+      img.src = cardData.img;
+      card.appendChild(img);
+
+      card.addEventListener('click', handleCardClick);
+      return card;
+    }
+
+    function handleCardClick() {
+      if (lockBoard || this === firstCard) return;
+
+      this.classList.add('flipped');
+
+      if (!firstCard) {
+        firstCard = this;
+        return;
+      }
+
+      secondCard = this;
+      lockBoard = true;
+
+      checkForMatch();
+    }
+
+    function checkForMatch() {
+      const isMatch = firstCard.dataset.name === secondCard.dataset.name;
+
+      if (isMatch) {
+        disableCards();
+        matchedPairs++;
+        if (matchedPairs === cardsArray.length / 2) {
+          showSuccessMessage();
+        }
+      } else {
+        unflipCards();
+      }
+    }
+
+    function disableCards() {
+      firstCard.removeEventListener('click', handleCardClick);
+      secondCard.removeEventListener('click', handleCardClick);
+
+      resetBoard();
+    }
+
+    function unflipCards() {
+      setTimeout(() => {
+        firstCard.classList.remove('flipped');
+        secondCard.classList.remove('flipped');
+
+        resetBoard();
+      }, 1000);
+    }
+
+    function resetBoard() {
+      [firstCard, secondCard] = [null, null];
+      lockBoard = false;
+    }
+
+    function showSuccessMessage() {
+      const successMessage = document.getElementById('successMessage');
+      successMessage.classList.add('visible');
+      setTimeout(() => {
+        successMessage.classList.remove('visible');
+        resetGame();
+      }, 3000);
+    }
+
+    function resetGame() {
+      const gameContainer = document.getElementById('gameContainer');
+      gameContainer.innerHTML = '';
+      matchedPairs = 0;
+      initializeGame();
+    }
+
+    function initializeGame() {
+      const shuffledCards = shuffle(cardsArray);
+      const gameContainer = document.getElementById('gameContainer');
+
+      shuffledCards.forEach(cardData => {
+        const card = createCard(cardData);
+        gameContainer.appendChild(card);
+      });
+    }
+
+    initializeGame();
+  </script>
+</body>
+</html>
