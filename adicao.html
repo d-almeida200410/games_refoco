@@ -245,5 +245,58 @@
       generateQuestion();
     };
   </script>
+  <script>
+    function generateQuestion() {
+      const num1 = Math.floor(Math.random() * (currentLevel * 10)) + 1;
+      const num2 = Math.floor(Math.random() * (currentLevel * 10)) + 1;
+      const correctAnswer = num1 + num2;
+  
+      document.getElementById('game').textContent = `${num1} + ${num2} = ?`;
+  
+      const answersContainer = document.getElementById('answers');
+      answersContainer.innerHTML = '';
+  
+      const usedAnswers = new Set();
+      usedAnswers.add(correctAnswer);
+  
+      // Gera uma posição aleatória para a resposta correta
+      const correctAnswerPosition = Math.floor(Math.random() * 4);
+  
+      for (let i = 0; i < 4; i++) {
+        const button = document.createElement('button');
+        if (i === correctAnswerPosition) {
+          // Insere a resposta correta na posição aleatória
+          button.textContent = correctAnswer;
+          button.onclick = () => {
+            score++;
+            if (score % 20 === 0) lives++;
+            updateScore();
+            updateLives();
+            currentLevel++;
+            generateQuestion();
+          };
+        } else {
+          // Gera respostas erradas
+          let wrongAnswer;
+          do {
+            wrongAnswer = correctAnswer + Math.floor(Math.random() * 10) - 5;
+          } while (usedAnswers.has(wrongAnswer) || wrongAnswer <= 0);
+          usedAnswers.add(wrongAnswer);
+  
+          button.textContent = wrongAnswer;
+          button.onclick = () => {
+            lives--;
+            updateLives();
+            if (lives === 0) {
+              alert('Você perdeu todas as vidas! O jogo será reiniciado.');
+              resetGame();
+            }
+          };
+        }
+        answersContainer.appendChild(button);
+      }
+    }
+  </script>
+  
 </body>
 </html>
