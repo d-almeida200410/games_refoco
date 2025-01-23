@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,17 +21,19 @@
         }
 
         .word-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-            gap: 5px;
-            justify-content: center;
-            margin: 20px auto;
-            max-width: 90vw;
-        }
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 2px; /* Reduzido de 5px para 2px */
+    justify-content: center;
+    margin: 20px auto;
+    max-width: calc(40px * 8 + 2px * 7); /* Ajustado para refletir a nova largura */
+}
+
 
         .letter {
-            width: 100%;
-            aspect-ratio: 1 / 1;
+            width: 40px;
+            /* Tamanho fixo para evitar inconsistências */
+            height: 40px;
             background-color: #ffebcd;
             border: 2px solid #ff6f61;
             display: flex;
@@ -41,6 +44,8 @@
             cursor: pointer;
             user-select: none;
             transition: background-color 0.3s, color 0.3s;
+            box-sizing: border-box;
+            /* Garante que a borda seja incluída no tamanho total */
         }
 
         .letter.selected {
@@ -52,6 +57,7 @@
             background-color: #ffebcd;
             color: #bbb;
         }
+
 
         .word-list {
             margin-top: 20px;
@@ -77,12 +83,15 @@
 
         /* Responsividade */
         @media (max-width: 600px) {
-            .title {
-                font-size: 1.5rem;
+            .letter {
+                width: 40px;
+                /* Reduz tamanho em telas menores */
+                height: 40px;
+                font-size: 1rem;
             }
 
-            .letter {
-                font-size: 1rem;
+            .title {
+                font-size: 1.5rem;
             }
 
             .word {
@@ -91,6 +100,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="title">Caça-Palavras Infantil</div>
 
@@ -249,4 +259,5 @@
         createGrid();
     </script>
 </body>
+
 </html>
