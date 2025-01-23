@@ -12,57 +12,82 @@
             margin: 0;
             padding: 0;
         }
+
         .title {
             font-size: 2rem;
             margin: 20px 0;
             color: #ff6f61;
         }
+
         .word-grid {
             display: grid;
-            grid-template-columns: repeat(8, 50px);
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
             gap: 5px;
             justify-content: center;
             margin: 20px auto;
+            max-width: 90vw;
         }
+
         .letter {
-            width: 50px;
-            height: 50px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
             background-color: #ffebcd;
             border: 2px solid #ff6f61;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             user-select: none;
             transition: background-color 0.3s, color 0.3s;
         }
+
         .letter.selected {
             background-color: #ff6f61;
             color: white;
         }
+
         .letter.found {
             background-color: #ffebcd;
             color: #bbb;
         }
+
         .word-list {
             margin-top: 20px;
         }
+
         .word {
             font-size: 1.2rem;
             margin: 5px;
             color: #333;
         }
+
         .word.found {
             text-decoration: line-through;
             color: #888;
         }
+
         .message {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: #28a745;
             margin-top: 20px;
             display: none;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .letter {
+                font-size: 1rem;
+            }
+
+            .word {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -85,6 +110,7 @@
     <div class="message" id="successMessage">Parabéns! Você encontrou todas as palavras!</div>
 
     <script>
+        // Script permanece o mesmo
         const gridSize = 8;
         const words = ["GATO", "CASA", "FLOR", "BOLA", "CARTA", "NINHO", "VELAS", "FADA"];
         const grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(null));
@@ -95,7 +121,7 @@
             words.forEach(word => {
                 let placed = false;
                 while (!placed) {
-                    const direction = Math.floor(Math.random() * 3); // 0 = horizontal, 1 = vertical, 2 = diagonal
+                    const direction = Math.floor(Math.random() * 3);
                     const startX = Math.floor(Math.random() * gridSize);
                     const startY = Math.floor(Math.random() * gridSize);
 
@@ -111,9 +137,9 @@
         }
 
         function canPlaceWord(word, startX, startY, direction) {
-            if (direction === 0 && startX + word.length > gridSize) return false; // Horizontal
-            if (direction === 1 && startY + word.length > gridSize) return false; // Vertical
-            if (direction === 2 && (startX + word.length > gridSize || startY + word.length > gridSize)) return false; // Diagonal
+            if (direction === 0 && startX + word.length > gridSize) return false;
+            if (direction === 1 && startY + word.length > gridSize) return false;
+            if (direction === 2 && (startX + word.length > gridSize || startY + word.length > gridSize)) return false;
 
             for (let i = 0; i < word.length; i++) {
                 const x = direction === 0 ? startX + i : direction === 2 ? startX + i : startX;
@@ -214,17 +240,11 @@
         }
 
         function resetGame() {
-    // Limpa o conjunto de palavras encontradas
-    foundWords.clear();
-    
-    // Limpa o tabuleiro e gera um novo
-    grid.forEach(row => row.fill(null)); // Reinicia a matriz do grid
-    createGrid();
-
-    // Remove a classe "found" da lista de palavras
-    document.querySelectorAll(".word").forEach(el => el.classList.remove("found"));
-}
-
+            foundWords.clear();
+            grid.forEach(row => row.fill(null));
+            createGrid();
+            document.querySelectorAll(".word").forEach(el => el.classList.remove("found"));
+        }
 
         createGrid();
     </script>
