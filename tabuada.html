@@ -158,10 +158,13 @@
     <button id="startButton" class="start-button">Iniciar Jogo</button>
     <button id="submitButton" class="submit-button" style="display: none;">Enviar Respostas</button>
     <div id="resultMessage" class="message" style="display: none;"></div>
+    <button id="downloadPdfButton" class="start-button" style="display: none;">Baixar Resultado</button>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <script>
     let currentLevel = 1;
+    const results = [];
 
     function updateLevel() {
       document.getElementById('level').textContent = `Nível: ${currentLevel}`;
@@ -169,11 +172,13 @@
 
     function resetGame() {
       currentLevel = 1;
+      results.length = 0;
       updateLevel();
       document.getElementById('startButton').style.display = 'block';
       document.getElementById('game').innerHTML = 'Clique no botão para começar o jogo!';
       document.getElementById('submitButton').style.display = 'none';
       document.getElementById('resultMessage').style.display = 'none';
+      document.getElementById('downloadPdfButton').style.display = 'none';
     }
 
     function generateTabuada() {
@@ -200,6 +205,7 @@
     }
 
     function checkAnswers() {
+      const levelResults = [];
       let correct = 0;
 
       for (let i = 1; i <= 10; i++) {
@@ -207,7 +213,15 @@
         const userAnswer = parseInt(input.value);
         const correctAnswer = currentLevel * i;
 
-        if (userAnswer === correctAnswer) {
+        const isCorrect = userAnswer === correctAnswer;
+        levelResults.push({
+          question: `${currentLevel} x ${i}`,
+          correctAnswer,
+          userAnswer: isNaN(userAnswer) ? 'Não respondeu' : userAnswer,
+          isCorrect,
+        });
+
+        if (isCorrect) {
           correct++;
           input.style.borderColor = '#32CD32';
         } else {
@@ -215,24 +229,42 @@
         }
       }
 
+      results.push(...levelResults);
       const message = document.getElementById('resultMessage');
       message.style.display = 'block';
+      message.textContent = `Você acertou ${correct} de 10! Avançando para o próximo nível...`;
+      message.className = 'message correct';
 
-      if (correct === 10) {
-        message.textContent = 'Parabéns! Você acertou todos!';
-        message.className = 'message correct';
-        currentLevel++;
-        if (currentLevel > 10) {
-          alert('Você completou todas as tabuadas! O jogo será reiniciado.');
-          resetGame();
-        } else {
-          updateLevel();
-          setTimeout(generateTabuada, 2000);
-        }
+      currentLevel++;
+      if (currentLevel > 10) {
+        document.getElementById('downloadPdfButton').style.display = 'block';
+        message.textContent = 'Você concluiu todas as tabuadas! Baixe seu resultado.';
+        document.getElementById('submitButton').style.display = 'none';
       } else {
-        message.textContent = `Você acertou ${correct} de 10. Tente novamente!`;
-        message.className = 'message wrong';
+        updateLevel();
+        setTimeout(generateTabuada, 2000);
       }
+    }
+
+    function downloadPdf() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.text('Relatório do Jogo de Tabuada', 10, 10);
+      let y = 20;
+
+      results.forEach((result, index) => {
+        const resultText = `${result.question} = ${result.correctAnswer}, Você respondeu: ${result.userAnswer} (${result.isCorrect ? 'Correto' : 'Errado'})`;
+        doc.text(resultText, 10, y);
+        y += 10;
+
+        if (y > 280) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+
+      doc.save('resultado_tabuada.pdf');
     }
 
     document.getElementById('startButton').onclick = () => {
@@ -242,6 +274,7 @@
     };
 
     document.getElementById('submitButton').onclick = checkAnswers;
+    document.getElementById('downloadPdfButton').onclick = downloadPdf;
   </script>
 </body>
 </html>
