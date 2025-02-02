@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Geometria</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        img {
+            max-width: 50%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 5px;
+            border: 2px solid #ff758c;
+            border-radius: 5px;
+            background: #fff0f3;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #ff758c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #ff5e78;
+        }
+
+        #finalScreen {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="gameContainer">
+        <h2>Que forma é essa?</h2>
+        <img id="shapeImage" src="" alt="Figura Geométrica">
+        <input type="text" id="name" placeholder="Nome da figura">
+        <input type="number" id="vertices" placeholder="Número de vértices">
+        <input type="number" id="faces" placeholder="Número de faces">
+        <input type="number" id="arestas" placeholder="Número de arestas">
+        <div class="buttons">
+            <button onclick="checkAnswer()">Próximo</button>
+        </div>
+    </div>
+
+    <div class="container" id="finalScreen">
+        <h2>Parabéns! Você concluiu o jogo!</h2>
+        <button onclick="restartGame()">Reiniciar</button>
+        <button onclick="generatePDF()">Gerar PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script>
+        const figures = [
+            { name: "círculo", vertices: 0, faces: 1, arestas: 1, img: "/img/circulo.png" },
+            { name: "quadrado", vertices: 4, faces: 1, arestas: 4, img: "/img/quadrado.png" },
+            { name: "triângulo", vertices: 3, faces: 1, arestas: 3, img: "/img/triangulo.png" },
+            { name: "retângulo", vertices: 4, faces: 1, arestas: 4, img: "/img/retangulo.png" },
+            { name: "pentágono", vertices: 5, faces: 1, arestas: 5, img: "/img/pentagono.png" },
+            { name: "hexágono", vertices: 6, faces: 1, arestas: 6, img: "/img/hexagono.png" },
+            { name: "heptágono", vertices: 7, faces: 1, arestas: 7, img: "/img/heptagono.png" },
+            { name: "octógono", vertices: 8, faces: 1, arestas: 8, img: "/img/octogono.png" },
+            { name: "cubo", vertices: 8, faces: 6, arestas: 12, img: "/img/cubo.png" },
+            { name: "pirâmide", vertices: 5, faces: 5, arestas: 8, img: "/img/piramide.png" },
+            { name: "cilindro", vertices: 0, faces: 3, arestas: 0, img: "/img/cilindro.png" },
+            { name: "paralelepípedo", vertices: 8, faces: 6, arestas: 12, img: "/img/paralelepipedo.png" },
+            { name: "esfera", vertices: 0, faces: 0, arestas: 0, img: "/img/esfera.png" },
+            { name: "cone", vertices: 1, faces: 2, arestas: 0, img: "/img/cone.png" },
+
+
+        ];
+
+        let currentIndex = 0;
+        let answers = [];
+
+        window.addEventListener('DOMContentLoaded', loadFigure);  // Chama a função logo ao carregar a página
+
+function loadFigure() {
+    if (currentIndex >= figures.length) {
+        document.getElementById("gameContainer").style.display = "none";
+        document.getElementById("finalScreen").style.display = "block";
+        return;
+    }
+
+    const shape = figures[currentIndex];
+    document.getElementById("shapeImage").src = shape.img;
+    document.getElementById("name").value = "";
+    document.getElementById("vertices").value = "";
+    document.getElementById("faces").value = "";
+    document.getElementById("arestas").value = "";
+}
+
+
+        function checkAnswer() {
+            const shape = figures[currentIndex];
+            let name = document.getElementById("name").value.trim();
+            let vertices = parseInt(document.getElementById("vertices").value);
+            let faces = parseInt(document.getElementById("faces").value);
+            let arestas = parseInt(document.getElementById("arestas").value);
+
+            answers.push({
+                figura: shape.name,
+                respostaNome: name,
+                respostaVertices: vertices,
+                respostaFaces: faces,
+                respostaArestas: arestas
+            });
+
+            currentIndex++;
+            setTimeout(loadFigure, 500);
+        }
+
+        function generatePDF() {
+    const doc = new window.jspdf.jsPDF();
+    doc.text("Relatório de Respostas", 10, 10);
+    let y = 20;
+
+    answers.forEach((ans, index) => {
+        if (y > 270) {  // Quando a página estiver cheia
+            doc.addPage();  // Adiciona uma nova página
+            y = 20;  // Reinicia a posição Y
+        }
+
+        // Reduzindo o tamanho da fonte para 10
+        doc.setFontSize(10);
+
+        doc.text(`${index + 1}. Figura: ${ans.figura}`, 10, y);
+        doc.text(`   Nome: ${ans.respostaNome}`, 10, y + 6); // Diminui o espaçamento
+        doc.text(`   Vértices: ${ans.respostaVertices}`, 10, y + 12); // Diminui o espaçamento
+        doc.text(`   Faces: ${ans.respostaFaces}`, 10, y + 18); // Diminui o espaçamento
+        doc.text(`   Arestas: ${ans.respostaArestas}`, 10, y + 24); // Diminui o espaçamento
+
+        y += 30; // Move para o próximo bloco, ajustado para menos espaço
+    });
+
+    doc.save("respostas.pdf");
+}
+
+        function restartGame() {
+            currentIndex = 0;
+            answers = [];
+            document.getElementById("finalScreen").style.display = "none";
+            document.getElementById("gameContainer").style.display = "block";
+            loadFigure();
+        }
+    </script>
+</body>
+
+</html>
