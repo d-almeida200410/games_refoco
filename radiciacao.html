@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/coruja.png">
+  <title>Jogo de Radiciação</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #00BFFF, #0000FF);
+      color: #FFFFFF;
+      text-align: center;
+    }
+
+    .container {
+      margin: 20px;
+    }
+
+    .logo-container {
+      display: inline-block;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 100px;
+      height: 100px;
+      margin: 10px auto;
+      border: 3px solid #FFFFFF;
+    }
+
+    .logo {
+      width: 100%;
+      height: auto;
+    }
+    .best-score {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #FFD700;
+      font-weight: bold;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #FFFFFF;
+      text-shadow: 2px 2px #0000FF;
+    }
+
+    .question {
+      background: #FFFFFF;
+      color: #0000FF;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 1.5rem;
+    }
+
+    .answer-container button,
+    .start-button {
+      background: #00BFFF;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .message {
+      font-size: 1.5rem;
+      padding: 15px;
+      border-radius: 15px;
+      margin: 20px auto;
+      width: 300px;
+      display: none;
+    }
+
+    .correct { background: #32CD32; }
+    .wrong { background: #FF6347; }
+
+    .score, .lives { font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="img/logo.png" alt="Logo do Reforço" class="logo">
+    </div>
+    <h1>Jogo de Radiciação</h1>
+    <div id="game" class="question">Clique no botão para iniciar o jogo!</div>
+    <div id="score" class="score">Acertos: 0</div>
+    <div id="lives" class="lives">Vidas: 3</div>
+    <div id="bestScore" class="best-score">
+        Melhor Pontuação: 0
+      </div>
+    <button id="startButton" class="start-button">Iniciar Jogo</button>
+    <div id="answers" class="answer-container"></div>
+    <div id="correctMessage" class="message correct">Você acertou! 🎉</div>
+    <div id="wrongMessage" class="message wrong">Tente novamente! 😢</div>
+  </div>
+  <script>
+     let currentLevel = 1;
+    let score = 0;
+    let lives = 3;
+
+    const bestScoreElement = document.getElementById('bestScore');
+    const savedBestScore = localStorage.getItem('bestraiz') || 0;
+    bestScoreElement.textContent = `Melhor Pontuação: ${savedBestScore}`;
+
+    function updateScore() {
+      document.getElementById('score').textContent = `Acertos: ${score}`;
+      if (score > savedBestScore) {
+        localStorage.setItem('bestraiz', score);
+        bestScoreElement.textContent = `Melhor Pontuação: ${score}`;
+      }
+    }
+
+    function updateLives() {
+      document.getElementById('lives').textContent = `Vidas: ${lives}`;
+    }
+
+    function generateQuestion() {
+      const result = Math.floor(Math.random() * 10) + 2;
+      const base = result * result;
+      document.getElementById('game').textContent = `Qual é a raiz quadrada de ${base}?`;
+      const answersContainer = document.getElementById('answers');
+      answersContainer.innerHTML = '';
+      
+      const correctButton = document.createElement('button');
+      correctButton.textContent = result;
+      correctButton.onclick = () => {
+        score++;
+        updateScore();
+        showMessage('correct');
+        setTimeout(generateQuestion, 2000);
+      };
+      answersContainer.appendChild(correctButton);
+      
+      for (let i = 0; i < 3; i++) {
+        let wrongAnswer;
+        do {
+          wrongAnswer = Math.floor(Math.random() * 20) + 1;
+        } while (wrongAnswer === result);
+        
+        const wrongButton = document.createElement('button');
+        wrongButton.textContent = wrongAnswer;
+        wrongButton.onclick = () => {
+          lives--;
+          updateLives();
+          if (lives === 0) {
+            alert('Você perdeu todas as vidas! O jogo será reiniciado.');
+            resetGame();
+          } else {
+            showMessage('wrong');
+          }
+        };
+        answersContainer.appendChild(wrongButton);
+      }
+    }
+
+    function showMessage(type) {
+      document.getElementById('correctMessage').style.display = type === 'correct' ? 'block' : 'none';
+      document.getElementById('wrongMessage').style.display = type === 'wrong' ? 'block' : 'none';
+      setTimeout(() => {
+        document.getElementById('correctMessage').style.display = 'none';
+        document.getElementById('wrongMessage').style.display = 'none';
+      }, 2000);
+    }
+
+    function resetGame() {
+      score = 0;
+      lives = 3;
+      updateScore();
+      updateLives();
+      document.getElementById('startButton').style.display = 'block';
+      document.getElementById('game').textContent = 'Clique no botão para iniciar o jogo!';
+      document.getElementById('answers').innerHTML = '';
+    }
+
+    document.getElementById('startButton').onclick = () => {
+      document.getElementById('startButton').style.display = 'none';
+      generateQuestion();
+    };
+  </script>
+</body>
+</html>

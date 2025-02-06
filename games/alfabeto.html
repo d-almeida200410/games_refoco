@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete o Alfabeto</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #ff4500;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px #ffa07a;
+        }
+        .game-container {
+            margin: 20px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffeb3b, #ff9800);
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            display: inline-block;
+            max-width: 90%;
+        }
+        .letters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+        }
+        .letter-box, .input-box {
+            width: 55px;
+            height: 55px;
+            font-size: 26px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+        .letter-box {
+            border: 3px solid #ff4500;
+            background: #fffacd;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .input-box {
+            text-align: center;
+            border: 3px solid #32cd32;
+            background: #fff;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #32cd32, #228b22);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #228b22, #006400);
+            transform: scale(1.1);
+        }
+        @media (max-width: 600px) {
+            .letter-box, .input-box {
+                width: 40px;
+                height: 40px;
+                font-size: 22px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .game-container {
+                padding: 15px;
+            }
+            button {
+                font-size: 18px;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Complete o Alfabeto! ✏️</h1>
+    <div class="game-container">
+        <div class="letters" id="alphabet-container"></div>
+        <button onclick="checkAnswers()">Verificar ✅</button>
+    </div>
+    <script>
+        let missingCount = 4;
+
+        function generateGame() {
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+            const container = document.getElementById("alphabet-container");
+            container.innerHTML = "";
+            
+            let missingIndexes = [];
+            while (missingIndexes.length < missingCount) {
+                let randomIndex = Math.floor(Math.random() * alphabet.length);
+                if (!missingIndexes.includes(randomIndex)) {
+                    missingIndexes.push(randomIndex);
+                }
+            }
+            
+            alphabet.forEach((letter, index) => {
+                if (missingIndexes.includes(index)) {
+                    let input = document.createElement("input");
+                    input.type = "text";
+                    input.maxLength = 1;
+                    input.classList.add("input-box");
+                    input.dataset.letter = letter;
+                    container.appendChild(input);
+                } else {
+                    let span = document.createElement("span");
+                    span.classList.add("letter-box");
+                    span.textContent = letter;
+                    container.appendChild(span);
+                }
+            });
+        }
+        
+        function checkAnswers() {
+            let inputs = document.querySelectorAll(".input-box");
+            let correct = true;
+
+            inputs.forEach(input => {
+                if (input.value.toUpperCase() !== input.dataset.letter) {
+                    input.style.backgroundColor = "#ff6347";
+                    correct = false;
+                } else {
+                    input.style.backgroundColor = "#32cd32";
+                }
+            });
+
+            if (correct) {
+                alert("🎉 Uau! Você completou o alfabeto! Continue assim! 🌟");
+                if (missingCount < 26) {
+                    missingCount += 2;
+                }
+                generateGame();
+            } else {
+                alert("😢 Opa! Algumas letras estão erradas. Tente novamente! 💪");
+            }
+        }
+        
+        generateGame();
+    </script>
+</body>
+</html>
