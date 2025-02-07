@@ -105,10 +105,22 @@
         <p id="numero"></p>
 
         <div class="input-group">
-            <input type="number" id="milhao" placeholder="MM"> milhão(ões)
+            <input type="number" id="centenaMilhao" placeholder="CM"> centena(s) de milhão
         </div>
         <div class="input-group">
-            <input type="number" id="milhar" placeholder="M"> milhar(es)
+            <input type="number" id="dezenaMilhao" placeholder="DM"> dezena(s) de milhão
+        </div>
+        <div class="input-group">
+            <input type="number" id="unidadeMilhao" placeholder="UM"> unidade(s) de milhão
+        </div>
+        <div class="input-group">
+            <input type="number" id="centenaMilhar" placeholder="CM"> centena(s) de milhar
+        </div>
+        <div class="input-group">
+            <input type="number" id="dezenaMilhar" placeholder="DM"> dezena(s) de milhar
+        </div>
+        <div class="input-group">
+            <input type="number" id="unidadeMilhar" placeholder="UM"> unidade(s) de milhar
         </div>
         <div class="input-group">
             <input type="number" id="centena" placeholder="C"> centena(s)
@@ -124,8 +136,6 @@
         <p class="mensagem" id="mensagem"></p>
     </div>
 </body>
-
-</html>
 
 <script>
     let numero;
@@ -171,21 +181,29 @@
     }
 
     function limparInputs() {
-        document.getElementById("milhao").value = "";
-        document.getElementById("milhar").value = "";
+        document.getElementById("centenaMilhao").value = "";
+        document.getElementById("dezenaMilhao").value = "";
+        document.getElementById("unidadeMilhao").value = "";
+        document.getElementById("centenaMilhar").value = "";
+        document.getElementById("dezenaMilhar").value = "";
+        document.getElementById("unidadeMilhar").value = "";
         document.getElementById("centena").value = "";
         document.getElementById("dezena").value = "";
         document.getElementById("unidade").value = "";
     }
 
     function verificar() {
-        let milhao = parseInt(document.getElementById("milhao").value) || 0;
-        let milhar = parseInt(document.getElementById("milhar").value) || 0;
+        let centenaMilhao = parseInt(document.getElementById("centenaMilhao").value) || 0;
+        let dezenaMilhao = parseInt(document.getElementById("dezenaMilhao").value) || 0;
+        let unidadeMilhao = parseInt(document.getElementById("unidadeMilhao").value) || 0;
+        let centenaMilhar = parseInt(document.getElementById("centenaMilhar").value) || 0;
+        let dezenaMilhar = parseInt(document.getElementById("dezenaMilhar").value) || 0;
+        let unidadeMilhar = parseInt(document.getElementById("unidadeMilhar").value) || 0;
         let centena = parseInt(document.getElementById("centena").value) || 0;
         let dezena = parseInt(document.getElementById("dezena").value) || 0;
         let unidade = parseInt(document.getElementById("unidade").value) || 0;
 
-        let respostaAluno = milhao * 1000000 + milhar * 1000 + centena * 100 + dezena * 10 + unidade;
+        let respostaAluno = centenaMilhao * 100000000 + dezenaMilhao * 10000000 + unidadeMilhao * 1000000 + centenaMilhar * 100000 + dezenaMilhar * 10000 + unidadeMilhar * 1000 + centena * 100 + dezena * 10 + unidade;
         let correta = respostaAluno === numero;
         respostas.push({ numero, respostaAluno, correta });
         totalQuestoes++;
@@ -197,7 +215,7 @@
             document.querySelector(".container").innerHTML = `
                     <h1>🎉 Parabéns! Você completou o jogo! 🎉</h1>
                     <p>Você respondeu todas as 30 questões.</p>
-                    <button onclick="gerarPDF()">Gerar PDF 📄</button>
+                    <button onclick="gerarPDF()">Gerar PDF 📚</button>
                     <button onclick="reiniciarJogo()">Reiniciar Jogo 🔄</button>
                 `;
             return;
@@ -210,6 +228,7 @@
         setTimeout(gerarNumero, 1500);
     }
 
+    gerarNumero();
     function gerarPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -229,13 +248,25 @@
         respostas = [];
         document.querySelector(".container").innerHTML = `
                 <h1>🎲 Decomponha o Número 🎲</h1>
-                <p id="numero"></p>
-        
+        <p id="numero"></p>
+
         <div class="input-group">
-            <input type="number" id="milhao" placeholder="MM"> milhão(ões)
+            <input type="number" id="centenaMilhao" placeholder="CM"> centena(s) de milhão
         </div>
         <div class="input-group">
-            <input type="number" id="milhar" placeholder="M"> milhar(es)
+            <input type="number" id="dezenaMilhao" placeholder="DM"> dezena(s) de milhão
+        </div>
+        <div class="input-group">
+            <input type="number" id="unidadeMilhao" placeholder="UM"> unidade(s) de milhão
+        </div>
+        <div class="input-group">
+            <input type="number" id="centenaMilhar" placeholder="CM"> centena(s) de milhar
+        </div>
+        <div class="input-group">
+            <input type="number" id="dezenaMilhar" placeholder="DM"> dezena(s) de milhar
+        </div>
+        <div class="input-group">
+            <input type="number" id="unidadeMilhar" placeholder="UM"> unidade(s) de milhar
         </div>
         <div class="input-group">
             <input type="number" id="centena" placeholder="C"> centena(s)
@@ -246,14 +277,12 @@
         <div class="input-group">
             <input type="number" id="unidade" placeholder="U"> unidade(s)
         </div>
-        
+
         <button onclick="verificar()">Verificar ✅</button>
         <p class="mensagem" id="mensagem"></p>
             `;
         gerarNumero();
     }
-
-    gerarNumero();
 </script>
 </body>
 
