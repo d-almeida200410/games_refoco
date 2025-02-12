@@ -87,9 +87,45 @@
                 padding: 10px 20px;
             }
         }
+        .config-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .config-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .config-content button {
+            margin: 10px;
+        }
+        .cursive {
+            font-family: 'Patrick Hand', cursive; /* Fonte cursiva simples */
+        }
+        .bastao {
+            font-family: 'Verdana', sans-serif; /* Fonte bastão simples */
+        }
     </style>
+    <!-- Adicionando as fontes do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Verdana&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="config-screen" id="config-screen">
+        <div class="config-content">
+            <h2>Escolha o tipo de alfabeto:</h2>
+            <button onclick="startGame('bastao')">Bastão</button>
+            <button onclick="startGame('cursivo')">Cursivo</button>
+        </div>
+    </div>
     <h1>Complete o Alfabeto! ✏️</h1>
     <div class="game-container">
         <div class="letters" id="alphabet-container"></div>
@@ -97,6 +133,13 @@
     </div>
     <script>
         let missingCount = 4;
+        let alphabetType = 'bastao'; // Padrão para bastão
+
+        function startGame(type) {
+            alphabetType = type;
+            document.getElementById('config-screen').style.display = 'none';
+            generateGame();
+        }
 
         function generateGame() {
             const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -123,6 +166,12 @@
                     let span = document.createElement("span");
                     span.classList.add("letter-box");
                     span.textContent = letter;
+                    // Aplica a classe de estilo correspondente ao tipo de alfabeto
+                    if (alphabetType === 'cursivo') {
+                        span.classList.add('cursive');
+                    } else {
+                        span.classList.add('bastao');
+                    }
                     container.appendChild(span);
                 }
             });
@@ -151,8 +200,6 @@
                 alert("😢 Opa! Algumas letras estão erradas. Tente novamente! 💪");
             }
         }
-        
-        generateGame();
     </script>
 </body>
 </html>
