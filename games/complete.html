@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" type="image/png" sizes="32x32" href="img/coruja.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/coruja.png">
     <title>Jogo de Associação de Palavras</title>
     <style>
         body {
@@ -102,13 +102,13 @@
             box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1);
             user-select: none;
             transition: all 0.2s;
-            touch-action: none;
         }
         
-        .word-balloon.active {
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            z-index: 100;
+        .word-balloon.dragging {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0.9;
         }
         
         .word-balloon::after {
@@ -376,13 +376,12 @@
         let score = 0;
         let matchedPairs = 0;
         let usedIndices = [];
-        let activeWordBalloon = null;
         let activeInputImage = null;
         let wordsTypedCorrectly = 0;
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let wordBalloonStartX = 0;
-        let wordBalloonStartY = 0;
+        let isDragging = false;
+        let currentBalloon = null;
+        let offsetX = 0;
+        let offsetY = 0;
 
         // Elementos do DOM
         const imagesContainer = document.getElementById('images-container');
@@ -532,164 +531,148 @@
                 wordBalloon.className = 'word-balloon';
                 wordBalloon.textContent = word;
                 wordBalloon.dataset.word = word;
-                wordBalloon.draggable = true;
                 
-                // Eventos de arrastar para desktop
-                wordBalloon.addEventListener('dragstart', handleDragStart);
+                // Eventos para desktop
+                wordBalloon.addEventListener('mousedown', handleMouseDown);
                 
-                // Eventos de toque para dispositivos móveis
+                // Eventos para mobile
                 wordBalloon.addEventListener('touchstart', handleTouchStart, { passive: false });
-                wordBalloon.addEventListener('touchmove', handleTouchMove, { passive: false });
-                wordBalloon.addEventListener('touchend', handleTouchEnd);
                 
                 wordsContainer.appendChild(wordBalloon);
-            });
-            
-            // Configurar zonas de soltar
-            document.querySelectorAll('.drop-zone').forEach(zone => {
-                zone.addEventListener('dragover', handleDragOver);
-                zone.addEventListener('drop', handleDrop);
             });
             
             resetBtn.disabled = false;
         }
 
-        // Manipuladores de arrastar para desktop
-        function handleDragStart(e) {
-            e.dataTransfer.setData('text/plain', e.target.dataset.word);
-            e.target.classList.add('active');
-            activeWordBalloon = e.target;
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            const word = e.dataTransfer.getData('text/plain');
-            const targetWord = e.target.dataset.targetWord;
-            
-            if (word === targetWord) {
-                // Correspondência correta
-                feedbackEl.textContent = 'Correto! Agora digite a palavra:';
-                feedbackEl.className = 'feedback correct';
+        // Manipuladores de eventos para desktop
+        function handleMouseDown(e) {
+            if (e.target.classList.contains('word-balloon')) {
+                isDragging = true;
+                currentBalloon = e.target;
+                const rect = currentBalloon.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
                 
-                // Marcar como correspondido
-                const wordBalloon = document.querySelector(`.word-balloon[data-word="${word}"]`);
-                if (wordBalloon) {
-                    wordBalloon.style.visibility = 'hidden';
-                }
+                currentBalloon.classList.add('dragging');
+                currentBalloon.style.position = 'fixed';
+                currentBalloon.style.zIndex = '1000';
+                currentBalloon.style.pointerEvents = 'none';
                 
-                const imgDiv = e.target.parentElement;
-                imgDiv.classList.add('matched');
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
                 
-                // Atualizar pontuação
-                score++;
-                scoreEl.textContent = `Acertos: ${score}`;
-                
-                // Mostrar o campo de input
-                showInput(imgDiv, word);
-            } else {
-                // Correspondência incorreta
-                feedbackEl.textContent = 'Tente novamente!';
-                feedbackEl.className = 'feedback incorrect';
-            }
-            
-            // Resetar o balão
-            if (activeWordBalloon) {
-                activeWordBalloon.classList.remove('active');
-                activeWordBalloon = null;
+                e.preventDefault();
             }
         }
 
-        // Manipuladores de toque para dispositivos móveis
+        function handleMouseMove(e) {
+            if (!isDragging || !currentBalloon) return;
+            
+            currentBalloon.style.left = `${e.clientX - offsetX}px`;
+            currentBalloon.style.top = `${e.clientY - offsetY}px`;
+            
+            e.preventDefault();
+        }
+
+        function handleMouseUp(e) {
+            if (!isDragging || !currentBalloon) return;
+            
+            const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+            checkDropTarget(dropTarget, currentBalloon);
+            
+            resetBalloon();
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            
+            e.preventDefault();
+        }
+
+        // Manipuladores de eventos para mobile
         function handleTouchStart(e) {
-            const wordBalloon = e.target;
-            if (!wordBalloon.classList.contains('word-balloon')) return;
-            
-            // Ativar o balão
-            wordBalloon.classList.add('active');
-            activeWordBalloon = wordBalloon;
-            
-            // Obter posição inicial do toque
-            const touch = e.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            
-            // Obter posição inicial do balão
-            const rect = wordBalloon.getBoundingClientRect();
-            wordBalloonStartX = rect.left;
-            wordBalloonStartY = rect.top;
-            
-            // Posicionar o balão absolutamente para movê-lo
-            wordBalloon.style.position = 'fixed';
-            wordBalloon.style.left = `${wordBalloonStartX}px`;
-            wordBalloon.style.top = `${wordBalloonStartY}px`;
-            wordBalloon.style.width = `${rect.width}px`;
-            wordBalloon.style.height = `${rect.height}px`;
-            
-            e.preventDefault();
+            if (e.target.classList.contains('word-balloon')) {
+                isDragging = true;
+                currentBalloon = e.target;
+                const touch = e.touches[0];
+                const rect = currentBalloon.getBoundingClientRect();
+                offsetX = touch.clientX - rect.left;
+                offsetY = touch.clientY - rect.top;
+                
+                currentBalloon.classList.add('dragging');
+                currentBalloon.style.position = 'fixed';
+                currentBalloon.style.zIndex = '1000';
+                currentBalloon.style.pointerEvents = 'none';
+                
+                document.addEventListener('touchmove', handleTouchMove, { passive: false });
+                document.addEventListener('touchend', handleTouchEnd);
+                
+                e.preventDefault();
+            }
         }
 
         function handleTouchMove(e) {
-            if (!activeWordBalloon) return;
+            if (!isDragging || !currentBalloon) return;
             
             const touch = e.touches[0];
-            const deltaX = touch.clientX - touchStartX;
-            const deltaY = touch.clientY - touchStartY;
-            
-            // Mover o balão
-            activeWordBalloon.style.left = `${wordBalloonStartX + deltaX}px`;
-            activeWordBalloon.style.top = `${wordBalloonStartY + deltaY}px`;
+            currentBalloon.style.left = `${touch.clientX - offsetX}px`;
+            currentBalloon.style.top = `${touch.clientY - offsetY}px`;
             
             e.preventDefault();
         }
 
         function handleTouchEnd(e) {
-            if (!activeWordBalloon) return;
+            if (!isDragging || !currentBalloon) return;
             
-            // Verificar se soltou sobre uma imagem
             const touch = e.changedTouches[0];
-            const elementAtDrop = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+            checkDropTarget(dropTarget, currentBalloon);
             
-            if (elementAtDrop) {
-                const dropZone = elementAtDrop.closest('.drop-zone');
-                if (dropZone) {
-                    const imgDiv = dropZone.parentElement;
-                    if (imgDiv && imgDiv.dataset.word === activeWordBalloon.dataset.word) {
-                        // Correspondência correta
-                        feedbackEl.textContent = 'Correto! Agora digite a palavra:';
-                        feedbackEl.className = 'feedback correct';
-                        
-                        // Marcar como correspondido
-                        activeWordBalloon.style.visibility = 'hidden';
-                        imgDiv.classList.add('matched');
-                        
-                        // Atualizar pontuação
-                        score++;
-                        scoreEl.textContent = `Acertos: ${score}`;
-                        
-                        // Mostrar o campo de input
-                        showInput(imgDiv, activeWordBalloon.dataset.word);
-                    } else {
-                        // Correspondência incorreta
-                        feedbackEl.textContent = 'Tente novamente!';
-                        feedbackEl.className = 'feedback incorrect';
-                    }
-                }
-            }
-            
-            // Resetar o balão
-            activeWordBalloon.classList.remove('active');
-            activeWordBalloon.style.position = '';
-            activeWordBalloon.style.left = '';
-            activeWordBalloon.style.top = '';
-            activeWordBalloon.style.width = '';
-            activeWordBalloon.style.height = '';
-            activeWordBalloon = null;
+            resetBalloon();
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleTouchEnd);
             
             e.preventDefault();
+        }
+
+        // Verificar onde o balão foi solto
+        function checkDropTarget(target, balloon) {
+            if (!target) {
+                return;
+            }
+            
+            const dropZone = target.closest('.drop-zone');
+            if (dropZone && dropZone.dataset.targetWord === balloon.dataset.word) {
+                // Acertou
+                feedbackEl.textContent = 'Correto! Agora digite a palavra:';
+                feedbackEl.className = 'feedback correct';
+                
+                balloon.style.visibility = 'hidden';
+                const imgDiv = dropZone.parentElement;
+                imgDiv.classList.add('matched');
+                
+                score++;
+                scoreEl.textContent = `Acertos: ${score}`;
+                
+                showInput(imgDiv, balloon.dataset.word);
+            } else {
+                // Errou
+                feedbackEl.textContent = 'Tente novamente!';
+                feedbackEl.className = 'feedback incorrect';
+            }
+        }
+
+        // Resetar o balão após soltar
+        function resetBalloon() {
+            if (!currentBalloon) return;
+            
+            currentBalloon.classList.remove('dragging');
+            currentBalloon.style.position = '';
+            currentBalloon.style.left = '';
+            currentBalloon.style.top = '';
+            currentBalloon.style.zIndex = '';
+            currentBalloon.style.pointerEvents = '';
+            
+            isDragging = false;
+            currentBalloon = null;
         }
 
         // Verificar palavra digitada
