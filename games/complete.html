@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/coruja.png">
-    <title>Jogo de Associação de Palavras</title>
+    <title>JOGO DE ASSOCIAÇÃO DE PALAVRAS</title>
     <style>
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', 'Arial', sans-serif;
             background-color: #f0f9ff;
             margin: 0;
             padding: 10px;
@@ -29,6 +28,8 @@
             text-align: center;
             margin-bottom: 10px;
             font-size: 1.5em;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         .subtitle {
@@ -36,6 +37,7 @@
             color: #666;
             margin-bottom: 20px;
             font-size: 0.9em;
+            text-transform: uppercase;
         }
         
         .game-area {
@@ -54,6 +56,8 @@
             margin-bottom: 10px;
             font-size: 1.2em;
             text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         .images-grid {
@@ -98,10 +102,13 @@
             padding: 10px 15px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 1.2em;
             box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1);
             user-select: none;
             transition: all 0.2s;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
         }
         
         .word-balloon.dragging {
@@ -140,6 +147,8 @@
             font-size: 1.1em;
             margin: 15px 0;
             height: 30px;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         .correct {
@@ -155,6 +164,8 @@
             font-size: 1em;
             color: #4a6baf;
             margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         .controls {
@@ -174,6 +185,8 @@
             cursor: pointer;
             transition: all 0.3s;
             font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         button:hover {
@@ -191,6 +204,8 @@
             color: #2ecc71;
             margin: 15px 0;
             display: none;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         .drag-hint {
@@ -199,6 +214,7 @@
             font-style: italic;
             margin-top: 10px;
             font-size: 0.8em;
+            text-transform: uppercase;
         }
         
         .loading {
@@ -206,6 +222,8 @@
             font-size: 1em;
             color: #4a6baf;
             margin: 15px 0;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         .input-container {
@@ -229,6 +247,7 @@
             text-align: center;
             font-size: 0.9em;
             font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-transform: uppercase;
         }
         
         .check-btn {
@@ -240,6 +259,8 @@
             font-size: 0.9em;
             cursor: pointer;
             margin-left: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         .input-active .input-container {
@@ -259,6 +280,7 @@
             font-weight: bold;
             color: #4a6baf;
             font-size: 0.9em;
+            text-transform: uppercase;
         }
         
         .completed-input {
@@ -270,6 +292,7 @@
             font-weight: bold;
             color: #2ecc71;
             font-size: 0.9em;
+            text-transform: uppercase;
         }
         
         .progress {
@@ -277,6 +300,8 @@
             margin-bottom: 10px;
             font-size: 1em;
             color: #4a6baf;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         
         @media (min-width: 768px) {
@@ -297,26 +322,31 @@
                 width: 160px;
                 height: 160px;
             }
+            
+            .word-balloon {
+                font-size: 1.3em;
+                padding: 12px 18px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Jogo de Associação de Palavras</h1>
-        <p class="subtitle">Arraste as palavras para as imagens e depois digite-as corretamente</p>
+        <h1>JOGO DE ASSOCIAÇÃO DE PALAVRAS</h1>
+        <p class="subtitle">ARRaste as palavras para as imagens e depois digite-as corretamente</p>
         
-        <div class="progress" id="progress">Complete 0 de 4 palavras</div>
-        <div class="score" id="score">Acertos: 0</div>
-        <div class="loading" id="loading">Carregando imagens...</div>
+        <div class="progress" id="progress">COMPLETE 0 DE 4 PALAVRAS</div>
+        <div class="score" id="score">ACERTOS: 0</div>
+        <div class="loading" id="loading">CARREGANDO IMAGENS...</div>
         
         <div class="game-area">
             <div class="images-section">
-                <div class="section-title">Imagens</div>
+                <div class="section-title">IMAGENS</div>
                 <div class="images-grid" id="images-container"></div>
             </div>
             
             <div class="words-section">
-                <div class="section-title">Palavras</div>
+                <div class="section-title">PALAVRAS</div>
                 <div class="words-container" id="words-container"></div>
                 <p class="drag-hint">Toque e arraste as palavras para as imagens correspondentes</p>
             </div>
@@ -325,50 +355,50 @@
         <div class="feedback" id="feedback"></div>
         
         <div class="controls">
-            <button id="next-btn" disabled>Próximo</button>
-            <button id="reset-btn">Reiniciar</button>
+            <button id="next-btn" disabled>PRÓXIMO</button>
+            <button id="reset-btn">REINICIAR</button>
         </div>
         
-        <div class="completed" id="completed">Parabéns! Você completou todas as associações!</div>
+        <div class="completed" id="completed">PARABÉNS! VOCÊ COMPLETOU TODAS AS ASSOCIAÇÕES!</div>
     </div>
 
     <script>
-        // Banco de palavras com imagens locais
+        // Banco de palavras com imagens locais (todas as palavras em maiúsculas)
         const items = [
-            { word: "gato", image: "/imagens/gato.png" },
-            { word: "casa", image: "/imagens/casa.png" },
-            { word: "bola", image: "/imagens/bola.png" },
-            { word: "avião", image: "/imagens/avião.png" },
-            { word: "origami", image: "/imagens/origami.png" },
-            { word: "danone", image: "/imagens/danone.png" },
-            { word: "pipoca", image: "/imagens/pipoca.png" },
-            { word: "picole", image: "/imagens/picole.png" },
-            { word: "salada", image: "/imagens/salada.png" },
-            { word: "pepino", image: "/imagens/pepino.png" },
-            { word: "banana", image: "/imagens/banana.png" },
-            { word: "macaco", image: "/imagens/macaco.png" },
-            { word: "navio", image: "/imagens/navio.png" },
-            { word: "violino", image: "/imagens/violino.png" },
-            { word: "lata", image: "/imagens/lata.png" },
-            { word: "tapete", image: "/imagens/tapete.png" },
-            { word: "bota", image: "/imagens/bota.png" },
-            { word: "camisa", image: "/imagens/camisa.png" },
-            { word: "goiaba", image: "/imagens/goiaba.png" },
-            { word: "tucano", image: "/imagens/tucano.png" },
-            { word: "tomate", image: "/imagens/tomate.png" },
-            { word: "cadeira", image: "/imagens/cadeira.png" },
-            { word: "rede", image: "/imagens/rede.png" },
-            { word: "sacola", image: "/imagens/sacola.png" },
-            { word: "caixa", image: "/imagens/caixa.png" },
-            { word: "caneca", image: "/imagens/caneca.png" },
-            { word: "garoto", image: "/imagens/garoto.png" },
-            { word: "vaca", image: "/imagens/vaca.png" },
-            { word: "leite", image: "/imagens/leite.png" },
-            { word: "caneta", image: "/imagens/caneta.png" },
-            { word: "abacaxi", image: "/imagens/abacaxi.png" },
-            { word: "panela", image: "/imagens/panela.png" },
-            { word: "peixe", image: "/imagens/peixe.png" },
-            { word: "bolo", image: "/imagens/bolo.png" },
+            { word: "GATO", image: "/imagens/gato.png" },
+            { word: "CASA", image: "/imagens/casa.png" },
+            { word: "BOLA", image: "/imagens/bola.png" },
+            { word: "AVIÃO", image: "/imagens/avião.png" },
+            { word: "ORIGAMI", image: "/imagens/origami.png" },
+            { word: "DANONE", image: "/imagens/danone.png" },
+            { word: "PIPOCA", image: "/imagens/pipoca.png" },
+            { word: "PICOLÉ", image: "/imagens/picole.png" },
+            { word: "SALADA", image: "/imagens/salada.png" },
+            { word: "PEPINO", image: "/imagens/pepino.png" },
+            { word: "BANANA", image: "/imagens/banana.png" },
+            { word: "MACACO", image: "/imagens/macaco.png" },
+            { word: "NAVIO", image: "/imagens/navio.png" },
+            { word: "VIOLINO", image: "/imagens/violino.png" },
+            { word: "LATA", image: "/imagens/lata.png" },
+            { word: "TAPETE", image: "/imagens/tapete.png" },
+            { word: "BOTA", image: "/imagens/bota.png" },
+            { word: "CAMISA", image: "/imagens/camisa.png" },
+            { word: "GOIABA", image: "/imagens/goiaba.png" },
+            { word: "TUCANO", image: "/imagens/tucano.png" },
+            { word: "TOMATE", image: "/imagens/tomate.png" },
+            { word: "CADEIRA", image: "/imagens/cadeira.png" },
+            { word: "REDE", image: "/imagens/rede.png" },
+            { word: "SACOLA", image: "/imagens/sacola.png" },
+            { word: "CAIXA", image: "/imagens/caixa.png" },
+            { word: "CANECA", image: "/imagens/caneca.png" },
+            { word: "GAROTO", image: "/imagens/garoto.png" },
+            { word: "VACA", image: "/imagens/vaca.png" },
+            { word: "LEITE", image: "/imagens/leite.png" },
+            { word: "CANETA", image: "/imagens/caneta.png" },
+            { word: "ABACAXI", image: "/imagens/abacaxi.png" },
+            { word: "PANELA", image: "/imagens/panela.png" },
+            { word: "PEIXE", image: "/imagens/peixe.png" },
+            { word: "BOLO", image: "/imagens/bolo.png" },
         ];
 
         // Variáveis do jogo
@@ -413,7 +443,7 @@
                 if (exists) {
                     availableItems.push(item);
                 } else {
-                    console.warn(`Imagem não encontrada: ${item.image}`);
+                    console.warn(`IMAGEM NÃO ENCONTRADA: ${item.image}`);
                 }
             }
             
@@ -422,7 +452,7 @@
 
         // Atualizar progresso
         function updateProgress() {
-            progressEl.textContent = `Complete ${wordsTypedCorrectly} de ${currentItems.length} palavras`;
+            progressEl.textContent = `COMPLETE ${wordsTypedCorrectly} DE ${currentItems.length} PALAVRAS`;
         }
 
         // Inicializar o jogo
@@ -442,8 +472,8 @@
             const workingItems = await loadAvailableItems();
             
             if (workingItems.length < 4) {
-                loadingEl.innerHTML = 'Adicione pelo menos 4 imagens na pasta "imagens" para jogar.<br>'
-                                    + 'Formato esperado: "imagens/nomedapalavra.png"';
+                loadingEl.innerHTML = 'ADICIONE PELO MENOS 4 IMAGENS NA PASTA "IMAGENS" PARA JOGAR.<br>'
+                                    + 'FORMATO ESPERADO: "IMAGENS/NOMEDAPALAVRA.PNG"';
                 return;
             }
             
@@ -498,7 +528,7 @@
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.className = 'word-input';
-                input.placeholder = 'Digite a palavra';
+                input.placeholder = 'DIGITE A PALAVRA';
                 
                 const checkBtn = document.createElement('button');
                 checkBtn.className = 'check-btn';
@@ -642,7 +672,7 @@
             const dropZone = target.closest('.drop-zone');
             if (dropZone && dropZone.dataset.targetWord === balloon.dataset.word) {
                 // Acertou
-                feedbackEl.textContent = 'Correto! Agora digite a palavra:';
+                feedbackEl.textContent = 'CORRETO! AGORA DIGITE A PALAVRA:';
                 feedbackEl.className = 'feedback correct';
                 
                 balloon.style.visibility = 'hidden';
@@ -650,12 +680,12 @@
                 imgDiv.classList.add('matched');
                 
                 score++;
-                scoreEl.textContent = `Acertos: ${score}`;
+                scoreEl.textContent = `ACERTOS: ${score}`;
                 
                 showInput(imgDiv, balloon.dataset.word);
             } else {
                 // Errou
-                feedbackEl.textContent = 'Tente novamente!';
+                feedbackEl.textContent = 'TENTE NOVAMENTE!';
                 feedbackEl.className = 'feedback incorrect';
             }
         }
@@ -677,8 +707,8 @@
 
         // Verificar palavra digitada
         function checkTypedWord(input, correctWord, imgDiv) {
-            if (input.value.toLowerCase() === correctWord.toLowerCase()) {
-                feedbackEl.textContent = 'Muito bem! Você acertou!';
+            if (input.value.toUpperCase() === correctWord) {
+                feedbackEl.textContent = 'MUITO BEM! VOCÊ ACERTOU!';
                 feedbackEl.className = 'feedback correct';
                 
                 // Marcar como digitado corretamente
@@ -697,10 +727,10 @@
                 // Verificar se todas as palavras foram digitadas corretamente
                 if (wordsTypedCorrectly === currentItems.length) {
                     nextBtn.disabled = false;
-                    feedbackEl.textContent = 'Parabéns! Você completou todas as palavras!';
+                    feedbackEl.textContent = 'PARABÉNS! VOCÊ COMPLETOU TODAS AS PALAVRAS!';
                 }
             } else {
-                feedbackEl.textContent = 'Tente novamente!';
+                feedbackEl.textContent = 'TENTE NOVAMENTE!';
                 feedbackEl.className = 'feedback incorrect';
             }
         }
@@ -763,7 +793,7 @@
         resetBtn.addEventListener('click', () => {
             score = 0;
             usedIndices = [];
-            scoreEl.textContent = `Acertos: ${score}`;
+            scoreEl.textContent = `ACERTOS: ${score}`;
             initGame();
         });
 
