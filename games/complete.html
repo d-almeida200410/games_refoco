@@ -477,7 +477,7 @@
                 return;
             }
             
-            // Selecionar 4 itens aleatórios que ainda não foram usados
+            // Selecionar exatamente 4 itens aleatórios que ainda não foram usados
             currentItems = [];
             const availableItems = workingItems.filter((_, index) => !usedIndices.includes(index));
             
@@ -489,16 +489,13 @@
                 return;
             }
             
-            // Selecionar até 4 itens (ou menos se não houver mais)
+            // Selecionar exatamente 4 itens (ou menos se não houver mais)
             const count = Math.min(4, availableItems.length);
-            while (currentItems.length < count) {
-                const randomIndex = Math.floor(Math.random() * availableItems.length);
-                const item = availableItems[randomIndex];
-                
-                if (!currentItems.some(i => i.word === item.word)) {
-                    currentItems.push(item);
-                    usedIndices.push(workingItems.findIndex(i => i.word === item.word));
-                }
+            const shuffledAvailable = shuffleArray([...availableItems]);
+            
+            for (let i = 0; i < count; i++) {
+                currentItems.push(shuffledAvailable[i]);
+                usedIndices.push(workingItems.findIndex(item => item.word === shuffledAvailable[i].word));
             }
             
             // Esconder mensagem de carregamento
