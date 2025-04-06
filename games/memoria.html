@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +11,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
+      padding: 20px;
       background: linear-gradient(135deg, #00ff11, #128c12);
       animation: backgroundAnimation 10s ease infinite;
     }
@@ -31,8 +32,35 @@
       margin: 10px 0;
     }
 
+    @keyframes bounceTitle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .score-board {
+      display: none;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 20px;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .player-score {
+      text-align: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .player-score.active {
+      color: yellow;
+      text-shadow: 0 0 5px rgba(255, 255, 0, 0.8);
+    }
+
     .game-container {
-      display: grid;
+      display: none;
       grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
       gap: 15px;
       max-width: 600px;
@@ -72,12 +100,6 @@
       display: block;
     }
 
-    @media (max-width: 600px) {
-      .game-container {
-        gap: 10px;
-      }
-    }
-
     .success-message {
       position: fixed;
       top: 50%;
@@ -90,18 +112,111 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
       display: none;
       text-align: center;
+      z-index: 100;
     }
 
     .success-message.visible {
       display: block;
     }
+
+    .success-message button {
+      margin-top: 15px;
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* 🔹 NOVO: Modal de seleção de modo */
+    .mode-selection {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      z-index: 200;
+    }
+
+    .mode-selection h2 {
+      margin-bottom: 20px;
+    }
+
+    .mode-selection button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .mode-selection button:hover {
+      background-color: #0056b3;
+    }
+
+    @media (max-width: 600px) {
+      .game-container {
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+  .mode-selection {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .mode-selection h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+
+  .game-mode {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .game-mode button {
+    font-size: 1rem;
+    padding: 12px;
+    width: 100%;
+  }
+}
+
   </style>
 </head>
 <body>
   <h1>Jogo da Memória</h1>
+
+  <!-- 🔹 NOVO: Modal de seleção -->
+  <div class="mode-selection" id="modeSelection">
+    <h2>🎮 Escolha o modo de jogo:</h2>
+    <button id="singlePlayerBtn">1 Jogador</button>
+    <button id="multiPlayerBtn">2 Jogadores</button>
+  </div>
+
+  <div class="score-board" id="scoreBoard">
+    <div class="player-score" id="player1Score">
+      Jogador 1: <span>0</span>
+    </div>
+    <div class="player-score" id="player2Score">
+      Jogador 2: <span>0</span>
+    </div>
+  </div>
+
   <div class="game-container" id="gameContainer"></div>
+
   <div class="success-message" id="successMessage">
-    Parabéns! Você completou o jogo😁👍🎉!!!<br>
+    <p id="winnerMessage">Parabéns! Você completou o jogo😁👍🎉!!!</p>
+    <button id="playAgainBtn">Jogar Novamente</button>
   </div>
 
   <script>
@@ -110,35 +225,66 @@
       { name: 'dog', img: '/img/dog.png' },
       { name: 'bird', img: '/img/bird.png' },
       { name: 'owl', img: '/img/owl.png' },
-      { name: 'cat', img: '/img/cat.png' },
-      { name: 'dog', img: '/img/dog.png' },
-      { name: 'bird', img: '/img/bird.png' },
-      { name: 'fish', img: '/img/fish.png' },
-      { name: 'owl', img: '/img/owl.png' },
       { name: 'fish', img: '/img/fish.png' },
       { name: 'arara', img: '/img/arara.png' },
-      { name: 'arara', img: '/img/arara.png' },
-      { name: 'borboleta', img: '/img/borboleta.png' },
       { name: 'borboleta', img: '/img/borboleta.png' },
       { name: 'macaco', img: '/img/monkey.png' },
-      { name: 'macaco', img: '/img/monkey.png' },
-      { name: 'baleia', img: '/img/baleia.png' },
       { name: 'baleia', img: '/img/baleia.png' },
       { name: 'lion', img: '/img/lion.png' },
-      { name: 'lion', img: '/img/lion.png' },
       { name: 'tiger', img: '/img/tiger.png' },
-      { name: 'tiger', img: '/img/tiger.png' },
-      { name: 'elefante', img: '/img/elefante.png' },
-      { name: 'elefante', img: '/img/elefante.png' },
-    ];
+      { name: 'elefante', img: '/img/elefante.png' }
+    ].flatMap(card => [card, { ...card }]);
 
     let firstCard = null;
     let secondCard = null;
     let lockBoard = false;
     let matchedPairs = 0;
+    let gameMode = '';
+    let currentPlayer = 1;
+    let player1Score = 0;
+    let player2Score = 0;
+    let cards = [];
+    let flippedCards = [];
+    let gameStarted = false;
 
-    function shuffle(array) {
-      return array.sort(() => Math.random() - 0.5);
+    const singlePlayerBtn = document.getElementById('singlePlayerBtn');
+    const multiPlayerBtn = document.getElementById('multiPlayerBtn');
+    const scoreBoard = document.getElementById('scoreBoard');
+    const player1ScoreElement = document.getElementById('player1Score');
+    const player2ScoreElement = document.getElementById('player2Score');
+    const gameContainer = document.getElementById('gameContainer');
+    const successMessage = document.getElementById('successMessage');
+    const winnerMessage = document.getElementById('winnerMessage');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+    const modeSelection = document.getElementById('modeSelection');
+
+    singlePlayerBtn.addEventListener('click', () => startGame('single'));
+    multiPlayerBtn.addEventListener('click', () => startGame('multi'));
+    playAgainBtn.addEventListener('click', resetGame);
+
+    function startGame(mode) {
+      gameMode = mode;
+      modeSelection.style.display = 'none'; // Esconde o modal
+      scoreBoard.style.display = mode === 'multi' ? 'flex' : 'none';
+      gameContainer.style.display = 'grid';
+      resetGame();
+    }
+
+    function initializeGame() {
+      const shuffledCards = shuffle([...cardsArray]);
+      gameContainer.innerHTML = '';
+      cards = shuffledCards.map(cardData => {
+        const card = createCard(cardData);
+        gameContainer.appendChild(card);
+        return {
+          element: card,
+          name: cardData.name,
+          flipped: false,
+          matched: false
+        };
+      });
+      gameStarted = true;
+      flippedCards = [];
     }
 
     function createCard(cardData) {
@@ -155,83 +301,129 @@
     }
 
     function handleCardClick() {
-      if (lockBoard || this === firstCard) return;
+      if (!gameStarted || lockBoard) return;
 
-      this.classList.add('flipped');
+      const cardIndex = cards.findIndex(c => c.element === this);
+      const card = cards[cardIndex];
 
-      if (!firstCard) {
-        firstCard = this;
-        return;
+      if (card.flipped || card.matched) return;
+
+      flipCard(cardIndex);
+
+      if (gameMode === 'single' && flippedCards.length === 1) {
+        setTimeout(machineTurn, 1000);
       }
+    }
 
-      secondCard = this;
-      lockBoard = true;
+    function flipCard(index) {
+      const card = cards[index];
+      if (card.flipped || card.matched || lockBoard) return;
 
-      checkForMatch();
+      card.element.classList.add('flipped');
+      card.flipped = true;
+      flippedCards.push(index);
+
+      if (flippedCards.length === 2) {
+        lockBoard = true;
+        checkForMatch();
+      }
     }
 
     function checkForMatch() {
-      const isMatch = firstCard.dataset.name === secondCard.dataset.name;
+      const [firstIndex, secondIndex] = flippedCards;
+      const card1 = cards[firstIndex];
+      const card2 = cards[secondIndex];
+
+      const isMatch = card1.name === card2.name;
 
       if (isMatch) {
-        disableCards();
+        card1.matched = true;
+        card2.matched = true;
+
+        if (gameMode === 'multi') {
+          if (currentPlayer === 1) {
+            player1Score++;
+            player1ScoreElement.querySelector('span').textContent = player1Score;
+          } else {
+            player2Score++;
+            player2ScoreElement.querySelector('span').textContent = player2Score;
+          }
+        }
+
         matchedPairs++;
         if (matchedPairs === cardsArray.length / 2) {
           showSuccessMessage();
         }
       } else {
-        unflipCards();
+        setTimeout(() => {
+          card1.element.classList.remove('flipped');
+          card2.element.classList.remove('flipped');
+          card1.flipped = false;
+          card2.flipped = false;
+
+          if (gameMode === 'multi') {
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            updatePlayerTurn();
+          }
+        }, 1000);
       }
+
+      flippedCards = [];
+      setTimeout(() => { lockBoard = false; }, isMatch ? 0 : 1000);
     }
 
-    function disableCards() {
-      firstCard.removeEventListener('click', handleCardClick);
-      secondCard.removeEventListener('click', handleCardClick);
+    function machineTurn() {
+      if (lockBoard || flippedCards.length !== 1 || gameMode !== 'single') return;
 
-      resetBoard();
+      const unflippedCards = cards
+        .map((card, index) => ({ ...card, index }))
+        .filter(card => !card.flipped && !card.matched);
+
+      if (unflippedCards.length === 0) return;
+
+      const randomIndex = Math.floor(Math.random() * unflippedCards.length);
+      flipCard(unflippedCards[randomIndex].index);
     }
 
-    function unflipCards() {
-      setTimeout(() => {
-        firstCard.classList.remove('flipped');
-        secondCard.classList.remove('flipped');
-
-        resetBoard();
-      }, 1000);
-    }
-
-    function resetBoard() {
-      [firstCard, secondCard] = [null, null];
-      lockBoard = false;
+    function updatePlayerTurn() {
+      player1ScoreElement.classList.toggle('active', currentPlayer === 1);
+      player2ScoreElement.classList.toggle('active', currentPlayer === 2);
     }
 
     function showSuccessMessage() {
-      const successMessage = document.getElementById('successMessage');
+      if (gameMode === 'single') {
+        winnerMessage.textContent = 'Parabéns! Você completou o jogo😁👍🎉!!!';
+      } else {
+        if (player1Score > player2Score) {
+          winnerMessage.textContent = `Jogador 1 venceu com ${player1Score} pontos! 🎉`;
+        } else if (player2Score > player1Score) {
+          winnerMessage.textContent = `Jogador 2 venceu com ${player2Score} pontos! 🎉`;
+        } else {
+          winnerMessage.textContent = `Empate! Ambos marcaram ${player1Score} pontos!`;
+        }
+      }
       successMessage.classList.add('visible');
-      setTimeout(() => {
-        successMessage.classList.remove('visible');
-        resetGame();
-      }, 3000);
     }
 
     function resetGame() {
-      const gameContainer = document.getElementById('gameContainer');
-      gameContainer.innerHTML = '';
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
       matchedPairs = 0;
+      flippedCards = [];
+      player1Score = 0;
+      player2Score = 0;
+      player1ScoreElement.querySelector('span').textContent = '0';
+      player2ScoreElement.querySelector('span').textContent = '0';
+      currentPlayer = 1;
+      updatePlayerTurn();
+      successMessage.classList.remove('visible');
       initializeGame();
     }
 
-    function initializeGame() {
-      const shuffledCards = shuffle(cardsArray);
-      const gameContainer = document.getElementById('gameContainer');
-
-      shuffledCards.forEach(cardData => {
-        const card = createCard(cardData);
-        gameContainer.appendChild(card);
-      });
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
     }
-
-    initializeGame();
   </script>
 </body>
 </html>
