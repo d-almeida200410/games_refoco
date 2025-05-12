@@ -334,7 +334,7 @@
 <body>
     <div class="container">
         <h1>JOGO DE ASSOCIAÇÃO DE PALAVRAS</h1>
-        <p class="subtitle">ARRaste as palavras para as imagens e depois digite-as corretamente</p>
+        <p class="subtitle">ARRASTE as palavras para as imagens e depois digite-as corretamente</p>
         
         <div class="progress" id="progress">COMPLETE 0 DE 4 PALAVRAS</div>
         <div class="score" id="score">ACERTOS: 0</div>
@@ -453,7 +453,7 @@
 
         // Atualizar progresso
         function updateProgress() {
-            progressEl.textContent = `COMPLETE ${wordsTypedCorrectly} DE ${currentItems.length} PALAVRAS`;
+            progressEl.textContent = `COMPLETE ${wordsTypedCorrectly} DE 4 PALAVRAS`; // Alterado para sempre mostrar 4
         }
 
         // Inicializar o jogo
@@ -478,26 +478,8 @@
                 return;
             }
             
-            // Selecionar exatamente 4 itens aleatórios que ainda não foram usados
-            currentItems = [];
-            const availableItems = workingItems.filter((_, index) => !usedIndices.includes(index));
-            
-            if (availableItems.length === 0) {
-                // Todas as combinações foram usadas
-                completedEl.style.display = 'block';
-                nextBtn.style.display = 'none';
-                loadingEl.style.display = 'none';
-                return;
-            }
-            
-            // Selecionar exatamente 4 itens (ou menos se não houver mais)
-            const count = Math.min(4, availableItems.length);
-            const shuffledAvailable = shuffleArray([...availableItems]);
-            
-            for (let i = 0; i < count; i++) {
-                currentItems.push(shuffledAvailable[i]);
-                usedIndices.push(workingItems.findIndex(item => item.word === shuffledAvailable[i].word));
-            }
+            // Selecionar exatamente 4 itens aleatórios
+            currentItems = shuffleArray([...workingItems]).slice(0, 4); // Sempre pega 4 itens
             
             // Esconder mensagem de carregamento
             loadingEl.style.display = 'none';
@@ -723,7 +705,7 @@
                 hideInput(imgDiv);
                 
                 // Verificar se todas as palavras foram digitadas corretamente
-                if (wordsTypedCorrectly === currentItems.length) {
+                if (wordsTypedCorrectly === 4) { // Alterado para 4
                     nextBtn.disabled = false;
                     feedbackEl.textContent = 'PARABÉNS! VOCÊ COMPLETOU TODAS AS PALAVRAS!';
                 }
@@ -790,7 +772,6 @@
         
         resetBtn.addEventListener('click', () => {
             score = 0;
-            usedIndices = [];
             scoreEl.textContent = `ACERTOS: ${score}`;
             initGame();
         });
